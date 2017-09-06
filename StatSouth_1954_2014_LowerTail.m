@@ -26,12 +26,13 @@ nSim = 1000;  % number of simulations, typ. 10000
 yearT = [10, 20, 50, 100, 250, 500, ...
          1000, 2000, 3000, 5000, 10000, 100000, 1000000];  % return periods
 yearT_plot = [50, 100, 250, 1000, 10000];  % return periods for plotting
-rangeT = 2016 - 1956 + 1; % range of years
-MileStoneYears = [1990, 2017, 2050, 2080, 2100];
+obsYearsRange = 2016 - 1956 + 1; % range of years
+msYears = [1990, 2017, 2050, 2080, 2100]; % milestone years
+num_msYears = length(msYears);  % number of milestone years
 
 % adjustment rates
-rIsoAdjust = 0.0011; % rate of isostatic adjustment (in meter/year)
-rStormContrib = 0.0012; % rate of storm contribution (in meter/year)
+rIA = 0.0011; % rate of isostatic adjustment (in meter/year)
+rSC = 0.0012; % rate of storm contribution (in meter/year)
 
 % SLR values from CRES 
 %(for reference see Fig 3.7 of Storebælt Østtunnel, Klimavurdering og Sikring, Ramperne 2015)
@@ -43,15 +44,18 @@ slr_prob =[0, 0.007488233, 0.025673941, 0.067394095, 0.132648695,...
     0.009092854, 0.008023107, 0.006953359, 0.005348738, 0.003637142,...
     0.002674369, 0.00203252, 0.001390672, 0.000641849, 0.000106975];
 
-%% Prep data
+%% Data prep
 obs = data_temp(data_temp > threshold); % data above threshold
 obsSorted = sort(obs, 'descend');  % sort, largest on top (descending order)
 obsOverThresh = obsSorted - threshold; % minus threshold
-obsLength = length(obsOverThresh);
+obsNum = length(obsOverThresh);
+
+% Poisson intensity = number of obs / number of years in obs
+lambdaPoisson = obsNum / obsYearsRange;
 
 %% Sea level rise
 slr_prob_cum = cumsum(slr_prob);
-% generate random nums between 0 and 1 from uniform distribution
+% generate random values between 0 and 1 from uniform distribution, to array of size nSim rows and 1 column
 rand0_1 = rand(nSim,1);
 % anonymous function to find the index of the cum prob that just exceeds (x). 
 % Example, if cum_prob =[0, 0.19, 0.22, 0.3...], then fHandle(0.2)= 3.  'first' is stated explicitly
@@ -61,6 +65,9 @@ indices = arrayfun(fHandle, rand0_1);
 % get the slr values corresponding to the indices
 slr_sim = slr_values(indices);
 
+slr_sim_msYears = zeros(num_msYears, nSim); % initialize array
+
+climateFactor = f_SLR_Meter(2100, rIA, rSC)
 
 
 
