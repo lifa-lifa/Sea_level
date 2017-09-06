@@ -1,6 +1,7 @@
 %% Oeresund A102102
 % * LIFA 2017-09-06
-% * Statistics for southern storms, lower tail
+% * Test to replicate Northern storm matlab file, to check that Southern
+% storm is replicated correctly in matlab
 close all
 clear all
 clc
@@ -8,7 +9,7 @@ clc
 %% Get data
 ReadFolder = strcat(pwd,'\input\');  % data folder
 dirList = dir(strcat(ReadFolder,'*.txt'));  %list all txt files
-fReadName = dirList(1).name; 
+fReadName = dirList(2).name; 
 full_name = [ReadFolder fReadName];
 fid = fopen(full_name, 'r');
 data_temp = textscan(fid, '%f', 'Delimiter', ',');
@@ -17,16 +18,15 @@ data_temp = cell2mat(data_temp);  % convert cell array to matrix
 
 
 %% Inputs
-threshold = 111;
+threshold = 119;
 alpha = 0.10;  % significance level
 nSim = 1000;  % number of simulations, typ. 10000
 
 % return periods and years
-yearT = [10, 20, 50, 100, 250, 500, ...
-         1000, 2000, 3000, 5000, 10000, 100000, 1000000]';  % return periods
+yearT = [2, 5, 10, 20, 50, 100, 250, 500, 1000, 10000]';  % return periods
 yearT_plot = [50, 100, 250, 1000, 10000]';  % return periods for plotting
-obsYearsRange = 2016 - 1956 + 1; % range of years
-msYears = [1990, 2017, 2050, 2080, 2100]'; % milestone years
+obsYearsRange = 185; % range of years
+msYears = [1990, 2100]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 num_yearT = length(yearT); % number of return period years
 
