@@ -1,7 +1,7 @@
 %This function computes the plotting position
 %The type can be Weibull, Hazen, Gringoroton and Beard
 %
-function y=plottingPosition(type,nobs,i)
+function y=f_PP(type,nobs,i)
     switch (type)
         case 'wbl'
             %Weibull plotting positions
