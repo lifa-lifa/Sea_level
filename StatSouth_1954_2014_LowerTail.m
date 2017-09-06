@@ -23,11 +23,28 @@ data_temp = cell2mat(data_temp);
 threshold = 111;
 alpha = 0.10;  % significance level
 NSim = 1000;  % number of simulations, typ. 10000
+
+% return periods and years
 TYear = [10, 20, 50, 100, 250, 500, ...
          1000, 2000, 3000, 5000, 10000, 100000, 1000000];  % return periods
 TYearPlot = [50, 100, 250, 1000, 10000];  % return periods for plotting
 TRange = 2016 - 1956 + 1; % range of years
 MileStoneYears = [1990, 2017, 2050, 2080, 2100];
+
+% adjustment rates
+IsoAdjust = 0.0011; % rate of isostatic adjustment (in meter/year)
+StormContrib = 0.0012; % rate of storm contribution (in meter/year)
+
+% SLR values from CRES
+seaLevelRiseValues=[0.000, 0.125, 0.250, 0.375, 0.500, 0.625, 0.750,...
+    0.875, 1.000, 1.125, 1.250, 1.375, 1.500, 1.625, 1.750, 1.875, ...
+    2.000, 2.125, 2.250, 2.375, 2.500, 2.625, 2.750, 2.875, 3.000];
+% Probabilities for this scenario (LIFA -> NEJO  Where is this from?)
+probabilities=[0, 0.007488233, 0.025673941, 0.067394095, 0.132648695,...
+    0.177578092, 0.174368849, 0.133718442, 0.084510056, 0.054557125,...
+    0.036371416, 0.023534446, 0.017115961, 0.013906718, 0.011232349,...
+    0.009092854, 0.008023107, 0.006953359, 0.005348738, 0.003637142,...
+    0.002674369, 0.00203252, 0.001390672, 0.000641849, 0.000106975];
 
 %% Calcs
 obs = data_temp(data_temp > threshold); % data above threshold
