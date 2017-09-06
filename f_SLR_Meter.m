@@ -10,16 +10,21 @@
 % 
 function y=f_SLR_Meter(year,rateOfIsostaticAdjustmentMeter,...
                             rateOfStormContributionMeter)
-    if (year < 1990)
+numYears = length(year);
+% factors in parabolic equation
+factor1=0.0071;
+factor2=0.1054;
+y = zeros(numYears, 1); % initialize array
+
+for i = 1:numYears;                        
+    if (year(i) < 1990)
         disp('Error: No climate change effect considered before year 1990');
         % Year is then set to 1990, equal to no climate change effect
-        year=1990;
+        year(i)=1990;
     end
-    % factors in parabolic equation
-    factor1=0.0071;
-    factor2=0.1054;
-    
-    y=(factor1*(year - 1990)^2 + factor2*(year - 1990))/100-...
-        rateOfIsostaticAdjustmentMeter*(year-1990)+...
-        rateOfStormContributionMeter*(year-1990);
+
+    y(i)=(factor1*(year(i) - 1990)^2 + factor2*(year(i) - 1990))/100-...
+        rateOfIsostaticAdjustmentMeter*(year(i)-1990)+...
+        rateOfStormContributionMeter*(year(i)-1990);
+end
 end

@@ -67,7 +67,8 @@ slr_sim = slr_values(indices);
 
 slr_sim_msYears = zeros(num_msYears, nSim); % initialize array
 
-climateFactor = f_SLR_Meter(2100, rIA, rSC)
+climateFactor = f_SLR_Meter(msYears, rIA, rSC)
+
 
 
 

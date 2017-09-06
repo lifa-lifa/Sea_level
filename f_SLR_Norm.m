@@ -9,11 +9,16 @@
 function y=f_SLR_Norm(year,rateOfIsostaticAdjustmentMeter,...
                             rateOfStormContributionMeter)
                         
-    yyval=seaLevelRiseMeter(year,rateOfIsostaticAdjustmentMeter,...
+numYears = length(year);
+y = zeros(numYears, 1); % initialize array                        
+
+for i = 1:numYears;
+    yyval=f_SLR_Meter(year(i),rateOfIsostaticAdjustmentMeter,...
                             rateOfStormContributionMeter);
                         
-    y2100val=seaLevelRiseMeter(2100,rateOfIsostaticAdjustmentMeter,...
+    y2100val=f_SLR_Meter(2100,rateOfIsostaticAdjustmentMeter,...
                             rateOfStormContributionMeter);
                         
-    y=yyval/y2100val;
+    y(i)=yyval/y2100val;
+end    
 end
