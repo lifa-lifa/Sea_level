@@ -24,10 +24,10 @@ nSim = 1000;  % number of simulations, typ. 10000
 
 % return periods and years
 yearT = [10, 20, 50, 100, 250, 500, ...
-         1000, 2000, 3000, 5000, 10000, 100000, 1000000];  % return periods
-yearT_plot = [50, 100, 250, 1000, 10000];  % return periods for plotting
+         1000, 2000, 3000, 5000, 10000, 100000, 1000000]';  % return periods
+yearT_plot = [50, 100, 250, 1000, 10000]';  % return periods for plotting
 obsYearsRange = 2016 - 1956 + 1; % range of years
-msYears = [1990, 2017, 2050, 2080, 2100]; % milestone years
+msYears = [1990, 2017, 2050, 2080, 2100]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 
 % adjustment rates
@@ -67,7 +67,8 @@ slr_sim = slr_values(indices);
 
 slr_sim_msYears = zeros(num_msYears, nSim); % initialize array
 
-climateFactor = f_SLR_Meter(msYears, rIA, rSC)
+% evaluate climate factor for milestone years
+climateFactor = f_SLR_Meter(msYears, rIA, rSC);
 
 
 
