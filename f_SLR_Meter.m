@@ -1,3 +1,5 @@
+% LIFA copied on 2017-09-06 from:
+% NEJO matlab function created for Nothern storms, 2017-04-01
 % This function return the sea level rise in meter
 % With factor1=0.0071 and factor2=0.1054, the sea level rise
 % end up to be 0.975 m from 1990 to 2100. This is the average value
