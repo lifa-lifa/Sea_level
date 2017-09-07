@@ -120,17 +120,21 @@ for i = 1:nSim;
 end
 
 % Get quantile values from the MC generated values at the desired quantile values
+% each column of wbl_est is for one return period
 wbl_quantiles = zeros(num_yearT, length(quantileValues)); % preallocate
 for i = 1:num_yearT;
-    % each column of wbl_est is for one return period
     wbl_quantiles(i,:) = quantile(wbl_est(:,i), quantileValues);
 end
 
-
-
-
 %% Combined SLR and WL
-
+sim_wl_slr = zeros(num_msYears, nSim, num_yearT); % preallocate, 3D array
+% convert sim slr from m to cm
+slr_sim_msYears_cm = 100*slr_sim_msYears;
+for i = 1:num_msYears;
+    % use broadcast function to element-wise add simulated SLR to Weibull
+    % estimated values. Loop through all milestone years
+    sim_wl_slr(i,:,:) = bsxfun(@plus, wbl_est, slr_sim_msYears_cm(:,i));
+end
 
 
 
