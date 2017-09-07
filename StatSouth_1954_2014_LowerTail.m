@@ -144,12 +144,19 @@ for i = 1:num_msYears;
     end
 end
 
+%% Save outputs to file
+writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
+% save simulated SLR
+    fWriteName = [writeFolder 'SLR.txt'];
+    save(fWriteName, 'slr_sim','-ascii');
+
+
 %% Plots
 %% Return period vs water level
 hfig = figure(1);
     % set figure appearances
     set(gca, 'XScale', 'log',...
-        'XLim',[0 max(yearT)]);
+             'XLim',[0 max(yearT)]);
     % plot things
     hold on
     plot(ariPP, obsSorted, '+'); % plot observations
@@ -159,6 +166,16 @@ hfig = figure(1);
     hold off
     
 %% QQ plots
+hfig = figure(2);
+% set figure appearances
+%     set(gca, 'XLim',[110 300],...
+%              'YLim',[110 300]);
+    % plot things
+    hold on
+    plot(wbl_obs, obsSorted, '+');
+    plot(quantile_wl_slr(4,:,1), quantile_wl_slr(4,:,1), 'k');
+    hold off
+
 
 
 
