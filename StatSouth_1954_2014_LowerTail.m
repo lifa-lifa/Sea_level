@@ -144,36 +144,48 @@ for i = 1:num_msYears;
     end
 end
 
-%% Save outputs to file
-writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
-% save simulated SLR
-    fWriteName = [writeFolder 'SLR.txt'];
-    save(fWriteName, 'slr_sim','-ascii');
+% %% Save outputs to file
+% writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
+% % save simulated SLR
+%     fWriteName = [writeFolder 'SLR.txt'];
+%     save(fWriteName, 'slr_sim','-ascii');
 
 
 %% Plots
-%% Return period vs water level
-hfig = figure(1);
-    % set figure appearances
-    set(gca, 'XScale', 'log',...
-             'XLim',[0 max(yearT)]);
-    % plot things
-    hold on
-    plot(ariPP, obsSorted, '+'); % plot observations
-    plot(yearT, quantile_wl_slr(4,:,1)); % plot median
-   
-    
-    hold off
+% %% Return period vs water level
+% hfig = figure(1);
+%     % set figure appearances
+%     set(gca, 'XScale', 'log',...
+%              'XLim',[0 max(yearT)]);
+%     % plot things
+%     hold on
+%     plot(ariPP, obsSorted, '+'); % plot observations
+%     plot(yearT, quantile_wl_slr(4,:,1)); % plot median
+%    
+%     
+%     hold off
     
 %% QQ plots
 hfig = figure(2);
 % set figure appearances
-%     set(gca, 'XLim',[110 300],...
-%              'YLim',[110 300]);
+    set(gca, 'XLim',[110 270],...
+             'YLim',[110 270]);
+    ylabel('Observed quantile [cm]');
+    xlabel('Theoretical quantile [cm]');
+    title('QQ Plot Copenhagen 1990 reference');
     % plot things
-    hold on
-    plot(wbl_obs, obsSorted, '+');
-    plot(quantile_wl_slr(4,:,1), quantile_wl_slr(4,:,1), 'k');
+        hold on
+        plot(wbl_obs, obsSorted, '+'); % observations
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(4,:,1), 'k'); % median
+        % 68% confidence
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(3,:,1), 'b');
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(5,:,1), 'b');
+        % 90% confidence
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(2,:,1), 'g');
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(6,:,1), 'g');
+        % 95% confidence
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(1,:,1), 'r');
+        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(7,:,1), 'r');
     hold off
 
 
