@@ -168,7 +168,7 @@ end
 %% QQ plots
 for msYear_idx = 1:num_msYears;
     hfig = figure(msYear_idx);
-    title_generated = ['QQ-Plot Copenhagen ' num2str(msYears(msYear_idx)) ' reference'];
+    title_generated = ['QQ-Plot Storms South Copenhagen 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
     % set figure appearances
         set(gca, 'XLim',[110 max(quantile_wl_slr(7,:,msYear_idx))],...
                  'YLim',[110 max(quantile_wl_slr(7,:,msYear_idx))]);
@@ -179,17 +179,18 @@ for msYear_idx = 1:num_msYears;
         % plot things
             hold on
             plot(wbl_obs, obsSorted, '+'); % observations
-            plot([0,400],[0,400], 'k'); % plot diagonal
+            plot([0,400],[0,400], 'k', 'HandleVisibility','off'); % plot diagonal
             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(4,:,msYear_idx), 'k'); % median
             % 68% confidence
             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(3,:,msYear_idx), 'b');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(5,:,msYear_idx), 'b');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(5,:,msYear_idx), 'b', 'HandleVisibility','off');
             % 90% confidence
             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(2,:,msYear_idx), 'g');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(6,:,msYear_idx), 'g');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(6,:,msYear_idx), 'g', 'HandleVisibility','off');
             % 95% confidence
             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(1,:,msYear_idx), 'r');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r', 'HandleVisibility','off');
+        legend('obs', 'median', '68% conf.', '90% conf.', '95% conf.');
         hold off
 end
 
