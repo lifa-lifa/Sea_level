@@ -30,6 +30,9 @@ msYears = [1990, 2017, 2050, 2080, 2100]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 num_yearT = length(yearT); % number of return period years
 
+% quantile values
+quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
+
 % adjustment rates
 rIA = 0.0011; % rate of isostatic adjustment (in meter/year)
 rSC = 0.0012; % rate of storm contribution (in meter/year)
@@ -116,7 +119,13 @@ for i = 1:nSim;
     wbl_est(i,:) = wblinv(qSim, re3(i,1), re3(i,2)) + threshold;
 end
 
-wlb_quantiles = zeros(); % preallocate
+% Get quantile values from the MC generated values at the desired quantile values
+wbl_quantiles = zeros(num_yearT, length(quantileValues)); % preallocate
+for i = 1:num_yearT;
+    % each column of wbl_est is for one return period
+    wbl_quantiles(i,:) = quantile(wbl_est(:,i), quantileValues);
+end
+
 
 
 
