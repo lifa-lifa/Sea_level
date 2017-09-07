@@ -166,27 +166,33 @@ end
 %     hold off
     
 %% QQ plots
-hfig = figure(2);
-% set figure appearances
-    set(gca, 'XLim',[110 270],...
-             'YLim',[110 270]);
-    ylabel('Observed quantile [cm]');
-    xlabel('Theoretical quantile [cm]');
-    title('QQ Plot Copenhagen 1990 reference');
-    % plot things
-        hold on
-        plot(wbl_obs, obsSorted, '+'); % observations
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(4,:,1), 'k'); % median
-        % 68% confidence
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(3,:,1), 'b');
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(5,:,1), 'b');
-        % 90% confidence
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(2,:,1), 'g');
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(6,:,1), 'g');
-        % 95% confidence
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(1,:,1), 'r');
-        plot(quantile_wl_slr(4,:,1), quantile_wl_slr(7,:,1), 'r');
-    hold off
+for msYear_idx = 1:num_msYears;
+    hfig = figure(msYear_idx);
+    title_generated = ['QQ-Plot Copenhagen ' num2str(msYears(msYear_idx)) ' reference'];
+    % set figure appearances
+        set(gca, 'XLim',[110 max(quantile_wl_slr(7,:,msYear_idx))],...
+                 'YLim',[110 max(quantile_wl_slr(7,:,msYear_idx))]);
+        box on
+        ylabel('Observed quantile [cm]');
+        xlabel('Theoretical quantile [cm]');
+        title(title_generated);
+        % plot things
+            hold on
+            plot(wbl_obs, obsSorted, '+'); % observations
+            plot([0,400],[0,400], 'k'); % plot diagonal
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(4,:,msYear_idx), 'k'); % median
+            % 68% confidence
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(3,:,msYear_idx), 'b');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(5,:,msYear_idx), 'b');
+            % 90% confidence
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(2,:,msYear_idx), 'g');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(6,:,msYear_idx), 'g');
+            % 95% confidence
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(1,:,msYear_idx), 'r');
+            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r');
+        hold off
+end
+
 
 
 
