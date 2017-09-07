@@ -84,10 +84,14 @@ ariPP=1./pp; % element-wise division
 mleParam = mle(obsOverThresh, 'distribution', 'Weibull');
 wblScale = mleParam(1);  
 wblShape = mleParam(2);
-% Compute the Weibull quantiles for our return periods
+% Compute the Weibull values for our return periods
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
-wbl_yearT = wblinv(qSim, wblScale, wblShape); % get return periods for given quantiles
-whatsit = wbl_yearT + threshold;
+% get wbl values for calculated quantiles, and add threshold back in
+wbl_yearT = wblinv(qSim, wblScale, wblShape) + threshold; 
+% Compute the Weibull estimates for observations
+qSimObs = 1-1./(lambdaPoisson*ariPP); % get quantiles for ariPP
+wbl_obs = wblinv(qSimObs, wblScale, wblShape)+threshold; % get wbl values, add threshold
+
 
 
 
