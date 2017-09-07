@@ -192,6 +192,11 @@ for msYear_idx = 1:num_msYears;
             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r', 'HandleVisibility','off');
         legend('obs', 'median', '68% conf.', '90% conf.', '95% conf.');
         hold off
+        
+        % save plots
+        writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
+        fWriteName = [writeFolder 'QQ-Plot Storms South CPH 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
+        print(fWriteName,'-dpng')
 end
 
 
