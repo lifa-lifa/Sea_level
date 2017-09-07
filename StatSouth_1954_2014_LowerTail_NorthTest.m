@@ -30,6 +30,9 @@ msYears = [1990, 2100]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 num_yearT = length(yearT); % number of return period years
 
+% quantile values
+quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
+
 % adjustment rates
 rIA = 0.0011; % rate of isostatic adjustment (in meter/year)
 rSC = 0.0012; % rate of storm contribution (in meter/year)
@@ -84,16 +87,93 @@ ariPP=1./pp; % element-wise division
 mleParam = mle(obsOverThresh, 'distribution', 'Weibull');
 wblScale = mleParam(1);  
 wblShape = mleParam(2);
-% Compute the Weibull quantiles for our return periods
+% Compute the Weibull values for our return periods
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
-wbl_yearT = wblinv(qSim, wblScale, wblShape); % get return periods for given quantiles
-whatsit = wbl_yearT + threshold;
+% get wbl values for calculated quantiles, and add threshold back in
+wbl_yearT = wblinv(qSim, wblScale, wblShape) + threshold; 
+% Compute the Weibull estimates for observations
+qSimObs = 1-1./(lambdaPoisson*ariPP); % get quantiles for ariPP
+wbl_obs = wblinv(qSimObs, wblScale, wblShape) + threshold; % get wbl values, add threshold
 
 
+%% Monte Carlo simulations for WL
+% generate random values Poisson distr. with lambda parameter (avg) of nobs,
+% to array of size nSim rows and 1 column. This generated avg number of events
+randPoisson = poissrnd(nobs, nSim, 1);
+% preallocate cell array (needed cell because different result lengths
+% corresponding to randPoisson values)
+wbl_MC = cell(nSim, 1);
+% for each avg num of events, generate rand values from Weibull distribution
+for i = 1:length(randPoisson);
+     MC_temp = wblrnd(wblScale, wblShape, [1 randPoisson(i)])'; % sim results given avg num of events
+     wbl_MC(i) = {MC_temp};  % store all results in cell array
+end
+
+% Determine variation in Weibull parameters based on MC simulations
+re3 = zeros(nSim, 2); % preallocate to store wlb scale and shape param
+wbl_est = zeros(nSim, num_yearT); % preallocate
+for i = 1:nSim;
+    % Extract Weibull scale and shape variables for each set of MC generated values
+    re3(i,:) = mle(wbl_MC{i}, 'distribution', 'Weibull'); 
+    % evaluate the Weibull values corresponding to quantiles, given MC based scale and shape parameters
+    wbl_est(i,:) = wblinv(qSim, re3(i,1), re3(i,2)) + threshold;
+end
+
+% Get quantile values from the MC generated values at the desired quantile values
+% each column of wbl_est is for one return period
+quantiles_wbl = zeros(num_yearT, length(quantileValues)); % preallocate
+for i = 1:num_yearT;
+    quantiles_wbl(i,:) = quantile(wbl_est(:,i), quantileValues);
+end
 
 %% Combined SLR and WL
+sim_wl_slr = zeros(nSim, num_yearT, num_msYears); % preallocate, 3D array
+% convert sim slr from m to cm
+slr_sim_msYears_cm = 100*slr_sim_msYears;
+for i = 1:num_msYears;
+    % use broadcast function to element-wise add simulated SLR to Weibull
+    % estimated values. Loop through all milestone years
+    sim_wl_slr(:,:,i) = bsxfun(@plus, wbl_est, slr_sim_msYears_cm(:,i));
+end
+
+% Get quantile values from the combined WL and SLR data
+quantile_wl_slr = zeros(length(quantileValues), num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+    for j = 1:num_yearT;
+        quantile_wl_slr(:,j,i) = quantile(sim_wl_slr(:,j,i), quantileValues);
+    end
+end
+
+%% Save outputs to file
+writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
+% save simulated SLR
+    fWriteName = [writeFolder 'SLR.txt'];
+    save(fWriteName, 'slr_sim','-ascii');
 
 
+%% Return period vs water level
+hfig = figure(1);
+    % set figure appearances
+    set(gca, 'XScale', 'log',...
+             'XLim',[0 max(yearT)]);
+    % plot things
+    hold on
+    plot(ariPP, obsSorted, '+'); % plot observations
+    plot(yearT, quantile_wl_slr(4,:,1)); % plot median
+   
+    
+    hold off
+    
+%% QQ plots
+hfig = figure(2);
+% set figure appearances
+%     set(gca, 'XLim',[110 300],...
+%              'YLim',[110 300]);
+    % plot things
+    hold on
+    plot(wbl_obs, obsSorted, '+');
+    plot(quantile_wl_slr(4,:,1), quantile_wl_slr(4,:,1), 'k');
+    hold off
 
 
 
