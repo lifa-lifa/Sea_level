@@ -19,7 +19,7 @@ data_temp = cell2mat(data_temp);  % convert cell array to matrix
 %% Inputs
 threshold = 111;
 alpha = 0.10;  % significance level
-nSim = 1000;  % number of simulations, typ. 10000
+nSim = 10000;  % number of simulations, typ. 10000
 
 % return periods and years
 yearT = [10, 20, 50, 100, 250, 500, ...
