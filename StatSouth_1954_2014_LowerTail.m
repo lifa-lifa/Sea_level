@@ -136,6 +136,14 @@ for i = 1:num_msYears;
     sim_wl_slr(:,:,i) = bsxfun(@plus, wbl_est, slr_sim_msYears_cm(:,i));
 end
 
+% Get quantile values from the combined WL and SLR data
+quantile_wl_slr = zeros(length(quantileValues), num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+    for j = 1:num_yearT;
+        quantile_wl_slr(:,j,i) = quantile(sim_wl_slr(:,j,i), quantileValues);
+    end
+end
+
 
 
 
