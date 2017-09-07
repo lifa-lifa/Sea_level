@@ -96,7 +96,7 @@ qSimObs = 1-pp; % get quantiles for ariPP %%LIFA much clearer than (1-1./(lambda
 wbl_obs = wblinv(qSimObs, wblScale, wblShape) + threshold; % get wbl values, add threshold
 
 
-%% Monte Carlo simulations 
+%% Monte Carlo simulations for WL
 % generate random values Poisson distr. with lambda parameter (avg) of nobs,
 % to array of size nSim rows and 1 column. This generated avg number of events
 randPoisson = poissrnd(nobs, nSim, 1);
@@ -121,9 +121,9 @@ end
 
 % Get quantile values from the MC generated values at the desired quantile values
 % each column of wbl_est is for one return period
-wbl_quantiles = zeros(num_yearT, length(quantileValues)); % preallocate
+quantiles_wbl = zeros(num_yearT, length(quantileValues)); % preallocate
 for i = 1:num_yearT;
-    wbl_quantiles(i,:) = quantile(wbl_est(:,i), quantileValues);
+    quantiles_wbl(i,:) = quantile(wbl_est(:,i), quantileValues);
 end
 
 %% Combined SLR and WL
@@ -143,6 +143,23 @@ for i = 1:num_msYears;
         quantile_wl_slr(:,j,i) = quantile(sim_wl_slr(:,j,i), quantileValues);
     end
 end
+
+%% Plots
+%% Return period vs water level
+hfig = figure(1);
+    % set figure appearances
+    set(gca, 'XScale', 'log',...
+        'XLim',[0 max(yearT)]);
+    % plot things
+    hold on
+    plot(ariPP, obsSorted, '+'); % plot observations
+    plot(yearT, quantile_wl_slr(4,:,1)); % plot median
+   
+    
+    hold off
+    
+%% QQ plots
+
 
 
 
