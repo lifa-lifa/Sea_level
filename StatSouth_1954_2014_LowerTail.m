@@ -90,20 +90,35 @@ qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 wbl_yearT = wblinv(qSim, wblScale, wblShape) + threshold; 
 % Compute the Weibull estimates for observations
 qSimObs = 1-pp; % get quantiles for ariPP %%LIFA much clearer than (1-1./(lambdaPoisson*ariPP))
-wbl_obs = wblinv(qSimObs, wblScale, wblShape)+ threshold; % get wbl values, add threshold
+wbl_obs = wblinv(qSimObs, wblScale, wblShape) + threshold; % get wbl values, add threshold
 
 
 %% Monte Carlo simulations 
 % generate random values Poisson distr. with lambda parameter (avg) of nobs,
 % to array of size nSim rows and 1 column. This generated avg number of events
 randPoisson = poissrnd(nobs, nSim, 1);
-% initialize cell array (needed because different result lengths
+% preallocate cell array (needed cell because different result lengths
 % corresponding to randPoisson values)
 wbl_MC = cell(nSim, 1);
+% for each avg num of events, generate rand values from Weibull distribution
 for i = 1:length(randPoisson);
-     MC_temp = wblrnd(wblScale, wblShape, [1 randPoisson(i)])';
-     wbl_MC(i) = {MC_temp};
+     MC_temp = wblrnd(wblScale, wblShape, [1 randPoisson(i)])'; % sim results given avg num of events
+     wbl_MC(i) = {MC_temp};  % store all results in cell array
 end
+
+% Determine variation in Weibull parameters based on MC simulations
+re3 = zeros(nSim, 2); % preallocate to store wlb scale and shape param
+wbl_est = zeros(nSim, num_yearT); % preallocate
+for i = 1:nSim;
+    % Extract Weibull scale and shape variables for each set of MC generated values
+    re3(i,:) = mle(wbl_MC{i}, 'distribution', 'Weibull'); 
+    % evaluate the Weibull values corresponding to quantiles, given MC based scale and shape parameters
+    wbl_est(i,:) = wblinv(qSim, re3(i,1), re3(i,2)) + threshold;
+end
+
+wlb_quantiles = zeros(); % preallocate
+
+
 
 %% Combined SLR and WL
 
