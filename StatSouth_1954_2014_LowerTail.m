@@ -73,10 +73,10 @@ nobs = length(obsOverThresh);
 % Poisson intensity = number of obs / number of years in obs
 lambdaPoisson = nobs / obsYearsRange;
 
-% Plotting position, select Weibull option in plotting position function
+% Plotting position, select option in plotting position function
 % calculate pp for each number of observations, transpose results to column vector
-pp = (lambdaPoisson)*arrayfun(@(i) f_PP('wbl',nobs,i),1:nobs)'; 
-ariPP=1./pp; % element-wise division
+pp = arrayfun(@(i) f_PP('haz',nobs,i),1:nobs)'; 
+ariPP=1./(lambdaPoisson*pp); % element-wise division %%LIFA moved lambdaPoisson multiplication from pp to ariPP
 
 % Maximum likelihood estimator
 % estimate the Weibull distribution parameters for scale and shape
@@ -89,7 +89,7 @@ qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 % get wbl values for calculated quantiles, and add threshold back in
 wbl_yearT = wblinv(qSim, wblScale, wblShape) + threshold; 
 % Compute the Weibull estimates for observations
-qSimObs = 1-1./(lambdaPoisson*ariPP); % get quantiles for ariPP
+qSimObs = 1-pp; % get quantiles for ariPP %%LIFA much clearer than (1-1./(lambdaPoisson*ariPP))
 wbl_obs = wblinv(qSimObs, wblScale, wblShape)+threshold; % get wbl values, add threshold
 
 
