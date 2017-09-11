@@ -56,32 +56,18 @@ t5_1825_2014 = L_1825_2014(5)/L_1825_2014(2);
 
 %% Wakeby
 % compute Wakeby Constants
-computed_WC1 = f_WakebyConst(L_1825_2014); % takes L-moments as input
+% takes L-moments as input, outputs constats as [D1 D2 D3]
+computed_WC = f_WakebyConst(L_1825_2014); 
 
-% compute Wakeby Constants again
 l2norm1825_2014 = t_1825_2014;
 l3norm1825_2014 = L_1825_2014(3)/L_1825_2014(1);
-computed_WC2 = f_WakebyConst([computed_WC1 l2norm1825_2014 l3norm1825_2014]);
 
-% solve polynomial of D1z^2 + D2z + D3 == 0 for z
-z = roots(computed_WC1);
-l1norm = 1.0;
+% compute Wakeby parameters
+[alphaW, betaW, gammaW, deltaW, xiW] = f_Wakeby(computed_WC(1), computed_WC(2), computed_WC(3),...
+    l2norm1825_2014, l3norm1825_2014);
 
-% beta and negative delta are the roots of the quadratic eq. 
-% beta being the larger of the two roots
-betaE = max(z); 
-deltaE = -min(z);
-if (betaE + deltaE) < 0; deltaE = 0.00001-betaE; else deltaE = deltaE; end
-if deltaE < 0; deltaE = 0.00001; else deltaE = deltaE; end
-% the other parameter, alpha, gamma, xi
-alphaE = (1+betaE)*(2+betaE)*(3+betaE)*((1+deltaE)*l2norm1825_2014...
-    -(3-deltaE)*l3norm1825_2014)/(4*(betaE+deltaE));
-gammaE = -(1-deltaE)*(2-deltaE)*(3-deltaE)*((1-betaE)*l2norm1825_2014...
-    -(3+betaE)*l3norm1825_2014)/(4*(betaE+deltaE));
-if gammaE < 0; gammaE = 0.00001; else gammaE = gammaE; end
-if gammaE < 0.000011; deltaE = 0.00001; else deltaE = deltaE; end
-xiE = l1norm - alphaE/(1+betaE) - gammaE/(1-deltaE);
 
+    
 
 
 
