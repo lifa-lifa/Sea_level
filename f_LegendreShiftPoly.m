@@ -1,5 +1,4 @@
-% LIFA 2017-09-11 copied from XIHE 
-% from QRR folder \\cowi.net\projects\A075000\A077472\DATA\MonteCarlo_AR5
+% LIFA 2017-09-11 copied from 
 % LegendreShiftPoly.m by Peter Roche, 12-08-2004
 % Based on recurrence relation
 % (n + 1)Pn+1 (x) - (1 + 2 n)(2 x - 1)Pn (x) + n Pn-1 (x) = 0
