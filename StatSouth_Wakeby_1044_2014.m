@@ -20,9 +20,9 @@ for i = 1:length(dirList);
 end
 
 % move cell array data to matrix, and sort
-obsP1 = sort(cell2mat(data_temp(1)), 'descend');
-obsP2 = sort(cell2mat(data_temp(2)), 'descend');
-obsP3 = sort(cell2mat(data_temp(3)), 'descend');
+obsP1 = sort(cell2mat(data_temp(1)), 'descend');  % P1 is 1044-1499
+obsP2 = sort(cell2mat(data_temp(2)), 'descend');  % P2 is 1500-1824
+obsP3 = sort(cell2mat(data_temp(3)), 'descend');  % P3 is 1825-2014
 
 %% Inputs
 thresholdP1 = 270;
@@ -46,6 +46,7 @@ q = 1-1./(lambdaPoisson * yearT);
 
 %% calculate L-moments
 % results from lmom function stored in array
+% output named using capital L, because confusion between l and 1 
 L_P3 = f_lmom(xP3, 5);  
 % calculate L-CV = t = l_2/l_1
 t_P3 = L_P3(2)/L_P3(1);
@@ -63,13 +64,27 @@ l2normP3 = t_P3;
 l3normP3 = L_P3(3)/L_P3(1);
 
 % compute Wakeby parameters
+% output contains 5 parameters for Wakeby distribution with shape 
+% parameters B and D, scale parameters A and G, and location parameter M (or X).
+% output is in the order of [A, B, G, D, X]
 [alphaW, betaW, gammaW, deltaW, xiW] = f_Wakeby(computed_WC(1), computed_WC(2), computed_WC(3),...
     l2normP3, l3normP3);
 
 %% Generate values
-nYrGen = 1824-1500+1-length(obsP2);
-    
+% find num years that have no data, and therefore need generated values
+nYrsGenP2 = (1824-1500+1-length(obsP2))*repetitionFactor;
+% Generate values for P2 from Wakeby, multiply by mean (l1) of P3
+wakebyEstP2 = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nYrsGenP2,1]);
+wakebyEstP2 = sort(wakebyEstP2, 'descend');    
 
+% print out max and min to check
+% max(wakebyEstP2)
+% min(wakebyEstP2)
+
+% num of random values that exceed threshold and need to be re-generated
+nRandReplace = sum(wakebyEstP2>thresholdP2);
+listToReplace = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nRandReplace,1]);
+listToReplace = sort(listToReplace, 'descend');
 
 
 
