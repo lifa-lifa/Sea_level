@@ -77,15 +77,28 @@ nYrsGenP2 = (1824-1500+1-length(obsP2))*repetitionFactor;
 wakebyEstP2 = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nYrsGenP2,1]);
 wakebyEstP2 = sort(wakebyEstP2, 'descend');    
 
-% print out max and min to check
-% max(wakebyEstP2)
-% min(wakebyEstP2)
+    % print out max and min to check
+    str = sprintf('Before replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
+    disp(str);
 
 % num of random values that exceed threshold and need to be re-generated
 nRandReplace = sum(wakebyEstP2>thresholdP2);
-listToReplace = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nRandReplace,1]);
-listToReplace = sort(listToReplace, 'descend');
+nTemp = 1;  % temp variable for while loop
+while nTemp > 0; % do until we have a list with only values below threshold
+    listToReplace = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nRandReplace,1]);
+    listToReplace = sort(listToReplace, 'descend');
+    nTemp = sum(listToReplace>thresholdP2);
+end
 
+% replace all values above threshold, by the re-generated list
+wakebyEstP2(wakebyEstP2>thresholdP2) = listToReplace;
+wakebyEstP2 = sort(wakebyEstP2, 'descend');  % sort data again
 
-
+    % print out max and min to check
+    str = sprintf('After  replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
+    disp(str);
+    
+ 
+    
+    
 
