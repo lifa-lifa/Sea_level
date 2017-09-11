@@ -54,5 +54,18 @@ t3_1825_2014 = L_1825_2014(3)/L_1825_2014(2);
 t4_1825_2014 = L_1825_2014(4)/L_1825_2014(2);
 t5_1825_2014 = L_1825_2014(5)/L_1825_2014(2);
 
+%% Wakeby
+% compute Wakeby Constants
+computed_WC1 = f_WakebyConst(L_1825_2014); % takes L-moments as input
+
+% compute Wakeby Constants again
+l2norm1825_2014 = t_1825_2014;
+l3norm1825_2014 = L_1825_2014(3)/L_1825_2014(1);
+computed_WC2 = f_WakebyConst([computed_WC1 l2norm1825_2014 l3norm1825_2014]);
+
+
+
+
+
 
 
