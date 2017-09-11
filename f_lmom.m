@@ -1,3 +1,5 @@
+% LIFA 2017-09-11 copied lmom function from XIHE 
+% from QRR folder \\cowi.net\projects\A075000\A077472\DATA\MonteCarlo_AR5
 % lmom by Kobus N. Bekker, 14-09-2004
 % Based on calculation of probability weighted moments and the coefficient
 % of the shifted Legendre polynomial.
