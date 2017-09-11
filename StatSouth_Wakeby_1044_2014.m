@@ -55,10 +55,10 @@ t3_P3 = L_P3(3)/L_P3(2);
 t4_P3 = L_P3(4)/L_P3(2);
 t5_P3 = L_P3(5)/L_P3(2);
 
-%% Wakeby
+%% Wakeby from P3
 % compute Wakeby Constants
 % takes L-moments as input, outputs constats as [D1 D2 D3]
-computed_WC = f_WakebyConst(L_P3); 
+wc_P3 = f_WakebyConst(L_P3); 
 
 l2normP3 = t_P3;
 l3normP3 = L_P3(3)/L_P3(1);
@@ -67,38 +67,80 @@ l3normP3 = L_P3(3)/L_P3(1);
 % output contains 5 parameters for Wakeby distribution with shape 
 % parameters B and D, scale parameters A and G, and location parameter M (or X).
 % output is in the order of [A, B, G, D, X]
-[alphaW, betaW, gammaW, deltaW, xiW] = f_Wakeby(computed_WC(1), computed_WC(2), computed_WC(3),...
+[A_P3, B_P3, G_P3, D_P3, X_P3] = f_Wakeby(wc_P3(1), wc_P3(2), wc_P3(3),...
     l2normP3, l3normP3);
 
-%% Generate values
+%% Generate values for P2
 % find num years that have no data, and therefore need generated values
 nYrsGenP2 = (1824-1500+1-length(obsP2))*repetitionFactor;
 % Generate values for P2 from Wakeby, multiply by mean (l1) of P3
-wakebyEstP2 = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nYrsGenP2,1]);
+wakebyEstP2 = L_P3(1)*f_wkbrnd(A_P3, B_P3, G_P3, D_P3, X_P3, [nYrsGenP2,1]);
 wakebyEstP2 = sort(wakebyEstP2, 'descend');    
 
     % print out max and min to check
-    str = sprintf('Before replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
+    str = sprintf('P2: Before replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
     disp(str);
 
 % num of random values that exceed threshold and need to be re-generated
-nRandReplace = sum(wakebyEstP2>thresholdP2);
+nReplaceP2 = sum(wakebyEstP2>thresholdP2);
 nTemp = 1;  % temp variable for while loop
 while nTemp > 0; % do until we have a list with only values below threshold
-    listToReplace = L_P3(1)*f_wkbrnd(alphaW, betaW, gammaW, deltaW, xiW, [nRandReplace,1]);
-    listToReplace = sort(listToReplace, 'descend');
-    nTemp = sum(listToReplace>thresholdP2);
+    listReplaceP2 = L_P3(1)*f_wkbrnd(A_P3, B_P3, G_P3, D_P3, X_P3, [nReplaceP2,1]);
+    nTemp = sum(listReplaceP2>thresholdP2);
 end
 
 % replace all values above threshold, by the re-generated list
-wakebyEstP2(wakebyEstP2>thresholdP2) = listToReplace;
+wakebyEstP2(wakebyEstP2>thresholdP2) = listReplaceP2;
 wakebyEstP2 = sort(wakebyEstP2, 'descend');  % sort data again
 
     % print out max and min to check
-    str = sprintf('After  replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
+    str = sprintf('P2: After  replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
     disp(str);
     
- 
-    
-    
+%% Wakeby from combined P2, P3 data 
+% join together observed data and generated data
+xP2P3 = sort(cat(1, xP2, xP3, wakebyEstP2), 'descend');  % concatenate along vertical dim
+% calculate L-moments and ratios
+L_P2P3 = f_lmom(xP2P3, 5);  
+% calculate L-CV = t = l_2/l_1
+t_P2P3 = L_P2P3(2)/L_P2P3(1);
+% calculate L-moment ratios (t_r = l_r / l_2)
+t3_P2P3 = L_P2P3(3)/L_P2P3(2);
+t4_P2P3 = L_P2P3(4)/L_P2P3(2);
+t5_P2P3 = L_P2P3(5)/L_P2P3(2);
 
+% compute Wakeby Constants
+wc_P2P3 = f_WakebyConst(L_P2P3); 
+l2normP2P3 = t_P2P3;
+l3normP2P3 = L_P2P3(3)/L_P2P3(1); 
+
+% compute Wakeby parameters [A, B, G, D, X]
+[A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3] = f_Wakeby(wc_P2P3(1), wc_P2P3(2), wc_P2P3(3),...
+    l2normP2P3, l3normP2P3);
+
+%% Generate values for P1
+% find num years that have no data, and therefore need generated values
+nYrsGenP1 = (1499-1044+1-length(obsP1))*repetitionFactor;
+% Generate values for P1 from Wakeby, multiply by mean (l1) of combined P2P3
+wakebyEstP1 = L_P2P3(1)*f_wkbrnd(A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3, [nYrsGenP1,1]);
+wakebyEstP1 = sort(wakebyEstP1, 'descend'); 
+
+    % print out max and min to check
+    str = sprintf('P1: Before replacement max and min: %.1f and %.1f', [max(wakebyEstP1), min(wakebyEstP1)]);
+    disp(str);
+
+% num of random values that exceed threshold and need to be re-generated
+nReplaceP1 = sum(wakebyEstP1>thresholdP1);
+nTemp = 1;  % temp variable for while loop
+while nTemp > 0; % do until we have a list with only values below threshold
+    listReplaceP1 = L_P2P3(1)*f_wkbrnd(A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3, [nReplaceP1,1]);
+    nTemp = sum(listReplaceP1>thresholdP1);
+end    
+
+% replace all values above threshold, by the re-generated list
+wakebyEstP1(wakebyEstP1>thresholdP1) = listReplaceP1;
+wakebyEstP1 = sort(wakebyEstP1, 'descend');  % sort data again
+
+    % print out max and min to check
+    str = sprintf('P1: After  replacement max and min: %.1f and %.1f', [max(wakebyEstP1), min(wakebyEstP1)]);
+    disp(str);
