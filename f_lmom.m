@@ -31,7 +31,7 @@ B = tB(length(tB):-1:1);
 
 for i = 1:nL-1
     Spc = zeros(length(B)-(i+1),1);
-    Coeff = [Spc ; LegendreShiftPoly(i)];
+    Coeff = [Spc ; f_LegendreShiftPoly(i)];
     l(i) = sum((Coeff.*B),1);
 end
 
