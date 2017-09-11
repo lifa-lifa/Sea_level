@@ -19,12 +19,15 @@ for i = 1:length(dirList);
 %     data_temp(i) = cell2mat(data_temp);  % convert cell array to matrix
 end
 
-% move cell array data to matrix
+% move cell array data to matrix, and sort
+obs1044_1499 = sort(cell2mat(data_temp(1)), 'descend');
+obs1500_1824 = sort(cell2mat(data_temp(2)), 'descend');
+obs1825_2014 = sort(cell2mat(data_temp(3)), 'descend');
 
 %% Inputs
 threshold1044_1499 = 270;
 threshold1500_1824 = 240;
-repetition = 100;
+repetitionFactor = 100;
 nSim = 10000;  % number of simulations, typ. 10000
 lambdaPoisson = 1;
 
@@ -32,8 +35,24 @@ lambdaPoisson = 1;
 yearT = [10, 20, 50, 100, 250, 500, ...
          1000, 2000, 3000, 5000, 10000, 100000]';  % return periods
 
+%% Prepare data
+% repeat data by repetition factor
+x1044_1499 = repelem(obs1044_1499, repetitionFactor);
+x1500_1824 = repelem(obs1500_1824, repetitionFactor);
+x1825_2014 = repelem(obs1825_2014, repetitionFactor);
 
+% quantiles
+q = 1-1./(lambdaPoisson * yearT);
 
+%% calculate L-moments
+% results from lmom function stored in array
+L_1825_2014 = f_lmom(x1825_2014, 5);  
+% calculate L-CV = t = l_2/l_1
+t_1825_2014 = L_1825_2014(2)/L_1825_2014(1);
+% calculate L-moment ratios (t_r = l_r / l_2)
+t3_1825_2014 = L_1825_2014(3)/L_1825_2014(2);
+t4_1825_2014 = L_1825_2014(4)/L_1825_2014(2);
+t5_1825_2014 = L_1825_2014(5)/L_1825_2014(2);
 
 
 
