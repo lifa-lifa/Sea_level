@@ -166,4 +166,13 @@ l3normP123 = L_P123(3)/L_P123(1);
 [A_P123, B_P123, G_P123, D_P123, X_P123] = f_Wakeby(wc_P123(1), wc_P123(2), wc_P123(3),...
     l2normP123, l3normP123);
 
+%% Wakeby distribution
+% plot check
+% x_plot = (0:0.01:4);
+% plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
+
+
+
+
+
 
