@@ -20,13 +20,13 @@ for i = 1:length(dirList);
 end
 
 % move cell array data to matrix, and sort
-obs1044_1499 = sort(cell2mat(data_temp(1)), 'descend');
-obs1500_1824 = sort(cell2mat(data_temp(2)), 'descend');
-obs1825_2014 = sort(cell2mat(data_temp(3)), 'descend');
+obsP1 = sort(cell2mat(data_temp(1)), 'descend');
+obsP2 = sort(cell2mat(data_temp(2)), 'descend');
+obsP3 = sort(cell2mat(data_temp(3)), 'descend');
 
 %% Inputs
-threshold1044_1499 = 270;
-threshold1500_1824 = 240;
+thresholdP1 = 270;
+thresholdP2 = 240;
 repetitionFactor = 100;
 nSim = 10000;  % number of simulations, typ. 10000
 lambdaPoisson = 1;
@@ -37,36 +37,37 @@ yearT = [10, 20, 50, 100, 250, 500, ...
 
 %% Prepare data
 % repeat data by repetition factor
-x1044_1499 = repelem(obs1044_1499, repetitionFactor);
-x1500_1824 = repelem(obs1500_1824, repetitionFactor);
-x1825_2014 = repelem(obs1825_2014, repetitionFactor);
+xP1 = repelem(obsP1, repetitionFactor);
+xP2 = repelem(obsP2, repetitionFactor);
+xP3 = repelem(obsP3, repetitionFactor);
 
 % quantiles
 q = 1-1./(lambdaPoisson * yearT);
 
 %% calculate L-moments
 % results from lmom function stored in array
-L_1825_2014 = f_lmom(x1825_2014, 5);  
+L_P3 = f_lmom(xP3, 5);  
 % calculate L-CV = t = l_2/l_1
-t_1825_2014 = L_1825_2014(2)/L_1825_2014(1);
+t_P3 = L_P3(2)/L_P3(1);
 % calculate L-moment ratios (t_r = l_r / l_2)
-t3_1825_2014 = L_1825_2014(3)/L_1825_2014(2);
-t4_1825_2014 = L_1825_2014(4)/L_1825_2014(2);
-t5_1825_2014 = L_1825_2014(5)/L_1825_2014(2);
+t3_P3 = L_P3(3)/L_P3(2);
+t4_P3 = L_P3(4)/L_P3(2);
+t5_P3 = L_P3(5)/L_P3(2);
 
 %% Wakeby
 % compute Wakeby Constants
 % takes L-moments as input, outputs constats as [D1 D2 D3]
-computed_WC = f_WakebyConst(L_1825_2014); 
+computed_WC = f_WakebyConst(L_P3); 
 
-l2norm1825_2014 = t_1825_2014;
-l3norm1825_2014 = L_1825_2014(3)/L_1825_2014(1);
+l2normP3 = t_P3;
+l3normP3 = L_P3(3)/L_P3(1);
 
 % compute Wakeby parameters
 [alphaW, betaW, gammaW, deltaW, xiW] = f_Wakeby(computed_WC(1), computed_WC(2), computed_WC(3),...
-    l2norm1825_2014, l3norm1825_2014);
+    l2normP3, l3normP3);
 
-
+%% Generate values
+nYrGen = 1824-1500+1-length(obsP2);
     
 
 
