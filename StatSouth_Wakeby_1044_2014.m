@@ -44,7 +44,7 @@ xP3 = repelem(obsP3, repetitionFactor);
 % quantiles
 q = 1-1./(lambdaPoisson * yearT);
 
-%% calculate L-moments
+%% Calculate L-moments
 % results from lmom function stored in array
 % output named using capital L, because confusion between l and 1 
 L_P3 = f_lmom(xP3, 5);  
@@ -97,32 +97,32 @@ wakebyEstP2 = sort(wakebyEstP2, 'descend');  % sort data again
     str = sprintf('P2: After  replacement max and min: %.1f and %.1f', [max(wakebyEstP2), min(wakebyEstP2)]);
     disp(str);
     
-%% Wakeby from combined P2, P3 data 
+%% Combined P2, P3 data 
 % join together observed data and generated data
-xP2P3 = sort(cat(1, xP2, xP3, wakebyEstP2), 'descend');  % concatenate along vertical dim
+xP23 = sort(cat(1, xP2, xP3, wakebyEstP2), 'descend');  % concatenate along vertical dim
 % calculate L-moments and ratios
-L_P2P3 = f_lmom(xP2P3, 5);  
+L_P23 = f_lmom(xP23, 5);  
 % calculate L-CV = t = l_2/l_1
-t_P2P3 = L_P2P3(2)/L_P2P3(1);
+t_P23 = L_P23(2)/L_P23(1);
 % calculate L-moment ratios (t_r = l_r / l_2)
-t3_P2P3 = L_P2P3(3)/L_P2P3(2);
-t4_P2P3 = L_P2P3(4)/L_P2P3(2);
-t5_P2P3 = L_P2P3(5)/L_P2P3(2);
+t3_P23 = L_P23(3)/L_P23(2);
+t4_P23 = L_P23(4)/L_P23(2);
+t5_P23 = L_P23(5)/L_P23(2);
 
 % compute Wakeby Constants
-wc_P2P3 = f_WakebyConst(L_P2P3); 
-l2normP2P3 = t_P2P3;
-l3normP2P3 = L_P2P3(3)/L_P2P3(1); 
+wc_P23 = f_WakebyConst(L_P23); 
+l2normP23 = t_P23;
+l3normP23 = L_P23(3)/L_P23(1); 
 
 % compute Wakeby parameters [A, B, G, D, X]
-[A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3] = f_Wakeby(wc_P2P3(1), wc_P2P3(2), wc_P2P3(3),...
-    l2normP2P3, l3normP2P3);
+[A_P23, B_P23, G_P23, D_P23, X_P23] = f_Wakeby(wc_P23(1), wc_P23(2), wc_P23(3),...
+    l2normP23, l3normP23);
 
 %% Generate values for P1
 % find num years that have no data, and therefore need generated values
 nYrsGenP1 = (1499-1044+1-length(obsP1))*repetitionFactor;
-% Generate values for P1 from Wakeby, multiply by mean (l1) of combined P2P3
-wakebyEstP1 = L_P2P3(1)*f_wkbrnd(A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3, [nYrsGenP1,1]);
+% Generate values for P1 from Wakeby, multiply by mean (l1) of combined P23
+wakebyEstP1 = L_P23(1)*f_wkbrnd(A_P23, B_P23, G_P23, D_P23, X_P23, [nYrsGenP1,1]);
 wakebyEstP1 = sort(wakebyEstP1, 'descend'); 
 
     % print out max and min to check
@@ -133,7 +133,7 @@ wakebyEstP1 = sort(wakebyEstP1, 'descend');
 nReplaceP1 = sum(wakebyEstP1>thresholdP1);
 nTemp = 1;  % temp variable for while loop
 while nTemp > 0; % do until we have a list with only values below threshold
-    listReplaceP1 = L_P2P3(1)*f_wkbrnd(A_P2P3, B_P2P3, G_P2P3, D_P2P3, X_P2P3, [nReplaceP1,1]);
+    listReplaceP1 = L_P23(1)*f_wkbrnd(A_P23, B_P23, G_P23, D_P23, X_P23, [nReplaceP1,1]);
     nTemp = sum(listReplaceP1>thresholdP1);
 end    
 
@@ -144,3 +144,26 @@ wakebyEstP1 = sort(wakebyEstP1, 'descend');  % sort data again
     % print out max and min to check
     str = sprintf('P1: After  replacement max and min: %.1f and %.1f', [max(wakebyEstP1), min(wakebyEstP1)]);
     disp(str);
+
+%% Combined P1, P2, P3
+% join together observed data and generated data
+xP123 = sort(cat(1, xP1, xP2, xP3, wakebyEstP1, wakebyEstP2), 'descend');  % concatenate along vertical dim
+% calculate L-moments and ratios
+L_P123 = f_lmom(xP123, 5);  
+% calculate L-CV = t = l_2/l_1
+t_P123 = L_P123(2)/L_P123(1);
+% calculate L-moment ratios (t_r = l_r / l_2)
+t3_P123 = L_P123(3)/L_P123(2);
+t4_P123 = L_P123(4)/L_P123(2);
+t5_P123 = L_P123(5)/L_P123(2);
+
+% compute Wakeby Constants
+wc_P123 = f_WakebyConst(L_P123); 
+l2normP123 = t_P123;
+l3normP123 = L_P123(3)/L_P123(1); 
+
+% compute Wakeby parameters [A, B, G, D, X]
+[A_P123, B_P123, G_P123, D_P123, X_P123] = f_Wakeby(wc_P123(1), wc_P123(2), wc_P123(3),...
+    l2normP123, l3normP123);
+
+
