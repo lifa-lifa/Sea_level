@@ -168,14 +168,16 @@ l3normP123 = L_P123(3)/L_P123(1);
 
 %% Wakeby distribution
 % plot check
-% x_plot = (0:0.01:5);
-% plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
+x_plot = (0:0.01:5);
+plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
 
 % quantiles
-quantEst = f_wkbinv(q, A_P3, B_P3, G_P3, D_P3, X_P3)
- 
+quantEst = f_wkbinv(q, A_P3, B_P3, G_P3, D_P3, X_P3);
+quantEst2 = f_wkbinv(q, A_P23, B_P23, G_P23, D_P23, X_P23);
+quantEst3 = f_wkbinv(q, A_P123, B_P123, G_P123, D_P123, X_P123);
+
 QE1 = L_P3(1)*quantEst
-
-
+QE2 = L_P23(1)*quantEst2
+QE3 = L_P123(1)*quantEst3
 
 
