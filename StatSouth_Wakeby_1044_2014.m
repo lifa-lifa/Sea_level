@@ -26,7 +26,8 @@ obsP3 = sort(cell2mat(data_temp(1)), 'descend');  % P3 is 1044-1499
 
 
 %% Inputs
-rng default;  % sets random seed. If uncommented, randoms are repeatable
+rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
+% If uncommented, randoms are repeatable
 thresholdP3 = 270;
 thresholdP2 = 240;
 repetitionFactor = 100;
