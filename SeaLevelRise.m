@@ -49,8 +49,8 @@ slr_sim_msYears = slr_sim * climateFactor';
 % %% Save outputs to file
 % writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
 % % save simulated SLR
-%     fWriteName = [writeFolder 'SLR.txt'];
-%     save(fWriteName, 'slr_sim','-ascii');
+%     fWriteName = [writeFolder 'slr_sim_msYears.txt'];
+%     save(fWriteName, 'slr_sim_msYears','-ascii');
 
 
 
