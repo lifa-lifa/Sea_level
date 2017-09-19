@@ -178,8 +178,17 @@ quantEst = f_wkbinv(q, A_P1, B_P1, G_P1, D_P1, X_P1);
 quantEst2 = f_wkbinv(q, A_P12, B_P12, G_P12, D_P12, X_P12);
 quantEst3 = f_wkbinv(q, A_P123, B_P123, G_P123, D_P123, X_P123);
 
-QE1 = L_P1(1)*quantEst
-QE2 = L_P12(1)*quantEst2
-QE3 = L_P123(1)*quantEst3
+QE1 = L_P1(1)*quantEst;
+QE2 = L_P12(1)*quantEst2;
+QE3 = L_P123(1)*quantEst3;
+
+%% Print results for comparison
+
+L_P1
+t_val_P1 = [t_P1 t3_P1 t4_P1 t5_P1]
+L_P12
+t_val_P12 = [t_P12 t3_P12 t4_P12 t5_P12]
+L_P123
+t_val_P123 = [t_P123 t3_P123 t4_P123 t5_P123]
 
 
