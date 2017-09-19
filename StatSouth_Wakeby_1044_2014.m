@@ -26,6 +26,7 @@ obsP3 = sort(cell2mat(data_temp(1)), 'descend');  % P3 is 1044-1499
 
 
 %% Inputs
+rng default;  % sets random seed. If uncommented, randoms are repeatable
 thresholdP3 = 270;
 thresholdP2 = 240;
 repetitionFactor = 100;
@@ -169,8 +170,8 @@ l3normP123 = L_P123(3)/L_P123(1);
 
 %% Wakeby distribution
 % plot check
-x_plot = (0:0.01:4);
-plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
+% x_plot = (0:0.01:4);
+% plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
 
 % quantiles
 quantEst = f_wkbinv(q, A_P1, B_P1, G_P1, D_P1, X_P1);
