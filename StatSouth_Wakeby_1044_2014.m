@@ -32,7 +32,7 @@ thresholdP3 = 270;
 thresholdP2 = 240;
 repetitionFactor = 100;
 nSim = 10000;  % number of simulations, typ. 10000
-lambdaPoisson = 1;
+lambdaPoisson = 1; % for AMS anslysis, lambda = 1.0
 
 % return periods and years
 yearT = [10, 20, 50, 100, 250, 500, ...
