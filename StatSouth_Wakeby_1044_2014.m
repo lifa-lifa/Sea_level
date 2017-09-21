@@ -182,7 +182,7 @@ tval_P123
 %% Save final Wakeby parameters from P123. Using .mat format, easier for next step to read  
 writeFolder = strcat(pwd,'\output\WakebyParam\');  % save to subfolder
 fWriteName = [writeFolder 'WakebyParam_P123.mat'];
-save(fWriteName, 'wp_P123');
+save(fWriteName, 'wp_P123', 'L_P123');
 
 
 
