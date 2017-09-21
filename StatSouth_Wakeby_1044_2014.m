@@ -192,4 +192,11 @@ t_val_P12 = [t_P12 t3_P12 t4_P12 t5_P12]
 L_P123
 t_val_P123 = [t_P123 t3_P123 t4_P123 t5_P123]
 
+%% Save final Wakeby parameters from P123. Using .mat format, easier for next step to read  
+writeFolder = strcat(pwd,'\output\WakebyParam\');  % save to subfolder
+fWriteName = [writeFolder 'WakebyParam_P123.mat'];
+save(fWriteName, 'A_P123');
+
+
+
 
