@@ -22,18 +22,22 @@ obsP1 = sort(cell2mat(obsP1), 'descend');  % P1 is 1825-2014
 
 %% Inputs
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
-nSim = 100;
+nSim = 10000;
 rIA = 0.0011;
 rSC = 0.0012;
 msYears = [1990 2100];
 num_yearT = length(yearT);
+num_msYears = length(msYears);
 xMax = 10; % used to clip the Wakeby estimates to 10 times the avg value
 
 % quantiles (Probability of non-exceedance, F = 1-1/T)
 q = 1-1./(1 * yearT); 
+% quantile values
+quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 
 %% SLR - simulated sea level rise for milestone years
 slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC);
+slr_sim_msYears_cm = 100*slr_sim_msYears;
 
 %% Monte Carlo sim for WL - based on Wakeby distribution
 nobs = length(obsP1); % based on AMS, therefore use nobs, instead of Poisson dist.
@@ -70,6 +74,26 @@ xval = min(xval, xMax);
 
 % multiply l1 of observed data back in for storm surge
 wkb_est = mean(obsP1)*xval;
+
+%% add SLR and WL together
+sim_wl_slr = zeros(nSim, num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+   % use broadfast function to element-wise add simulated SLR to Wakeby estimate
+   % loop through all milestone years
+   sim_wl_slr(:,:,i) = bsxfun(@plus, wkb_est, slr_sim_msYears_cm(:,i));
+end
+
+% get quantile values from the combined SLR and WL data
+quantile_wl_slr = zeros(length(quantileValues), num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+    for j = 1:num_yearT;
+        quantile_wl_slr(:,j,i) = quantile(sim_wl_slr(:,j,i), quantileValues);
+    end
+end
+
+% print
+quantile_wl_slr./100 % in meters
+
 
 
 
