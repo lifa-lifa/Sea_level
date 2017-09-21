@@ -50,20 +50,17 @@ q = 1-1./(lambdaPoisson * yearT);
 %% Calculate L-moments
 % results from lmom function stored in array
 % output named using capital L, because confusion between l and 1 
-L_P1 = f_lmom(xP1, 5);  
-% calculate L-CV = t = l_2/l_1
-t_P1 = L_P1(2)/L_P1(1);
-% calculate L-moment ratios (t_r = l_r / l_2)
-t3_P1 = L_P1(3)/L_P1(2);
-t4_P1 = L_P1(4)/L_P1(2);
-t5_P1 = L_P1(5)/L_P1(2);
+L_P1 = f_lmom(xP1, 5);
+% calculate L-CV = t = l_2/l_1 and L-moment ratios (t_r = l_r / l_2)
+% output in order of [t t3 t4 t5]
+tval_P1 = f_tvalues(L_P1);
 
 %% Wakeby from P1
 % compute Wakeby Constants
 % takes L-moments as input, outputs constats as [D1 D2 D3]
 wc_P1 = f_WakebyConst(L_P1); 
 
-l2normP1 = t_P1;
+l2normP1 = tval_P1(1);
 l3normP1 = L_P1(3)/L_P1(1);
 
 % compute Wakeby parameters
@@ -103,17 +100,14 @@ wakebyEstP2 = sort(wakebyEstP2, 'descend');  % sort data again
 % join together observed data and generated data
 xP12 = sort(cat(1, xP2, xP1, wakebyEstP2), 'descend');  % concatenate along vertical dim
 % calculate L-moments and ratios
-L_P12 = f_lmom(xP12, 5);  
-% calculate L-CV = t = l_2/l_1
-t_P12 = L_P12(2)/L_P12(1);
-% calculate L-moment ratios (t_r = l_r / l_2)
-t3_P12 = L_P12(3)/L_P12(2);
-t4_P12 = L_P12(4)/L_P12(2);
-t5_P12 = L_P12(5)/L_P12(2);
+L_P12 = f_lmom(xP12, 5); 
+% calculate L-CV = t = l_2/l_1 and L-moment ratios (t_r = l_r / l_2)
+% output in order of [t t3 t4 t5]
+tval_P12 = f_tvalues(L_P12);
 
 % compute Wakeby Constants
 wc_P12 = f_WakebyConst(L_P12); 
-l2normP12 = t_P12;
+l2normP12 = tval_P12(1);
 l3normP12 = L_P12(3)/L_P12(1); 
 
 % compute Wakeby parameters [A, B, G, D, X]
@@ -151,16 +145,13 @@ wakebyEstP3 = sort(wakebyEstP3, 'descend');  % sort data again
 xP123 = sort(cat(1, xP1, xP2, xP3, wakebyEstP3, wakebyEstP2), 'descend');  % concatenate along vertical dim
 % calculate L-moments and ratios
 L_P123 = f_lmom(xP123, 5);  
-% calculate L-CV = t = l_2/l_1
-t_P123 = L_P123(2)/L_P123(1);
-% calculate L-moment ratios (t_r = l_r / l_2)
-t3_P123 = L_P123(3)/L_P123(2);
-t4_P123 = L_P123(4)/L_P123(2);
-t5_P123 = L_P123(5)/L_P123(2);
+% calculate L-CV = t = l_2/l_1 and L-moment ratios (t_r = l_r / l_2)
+% output in order of [t t3 t4 t5]
+tval_P123 = f_tvalues(L_P123);
 
 % compute Wakeby Constants
 wc_P123 = f_WakebyConst(L_P123); 
-l2normP123 = t_P123;
+l2normP123 = tval_P123(1);
 l3normP123 = L_P123(3)/L_P123(1); 
 
 % compute Wakeby parameters [A, B, G, D, X]
@@ -182,11 +173,11 @@ QE3 = L_P123(1)*quantEst3;
 
 %% Print results for comparison
 L_P1
-t_val_P1 = [t_P1 t3_P1 t4_P1 t5_P1]
+tval_P1
 L_P12
-t_val_P12 = [t_P12 t3_P12 t4_P12 t5_P12]
+tval_P12
 L_P123
-t_val_P123 = [t_P123 t3_P123 t4_P123 t5_P123]
+tval_P123
 
 %% Save final Wakeby parameters from P123. Using .mat format, easier for next step to read  
 writeFolder = strcat(pwd,'\output\WakebyParam\');  % save to subfolder
