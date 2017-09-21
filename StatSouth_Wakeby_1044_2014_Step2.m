@@ -27,6 +27,10 @@ rIA = 0.0011;
 rSC = 0.0012;
 msYears = [1990 2100];
 num_yearT = length(yearT);
+xMax = 10; % used to clip the Wakeby estimates to 10 times the avg value
+
+% quantiles (Probability of non-exceedance, F = 1-1/T)
+q = 1-1./(1 * yearT); 
 
 %% SLR - simulated sea level rise for milestone years
 slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC);
@@ -43,8 +47,29 @@ for i = 1:nSim;
 end
 
 % For each MC simulation, fit the Wakeby distribution again
-wkb_MC_param = cell(nSim, 1); % preallocate
-wkb_est = zeros(nSim, num_yearT);
+wp_MC = cell(nSim, 1); % preallocate
+xval = zeros(nSim, num_yearT); % preallocate
+for i = 1:nSim;
+   % L-moments
+   L_MC = f_lmom(wkb_MC{i}, 5);
+   % t values
+   t_MC = f_tvalues(L_MC);
+   % Wakeby constants
+   wc_MC = f_WakebyConst(L_MC);
+   l2norm = t_MC(1);
+   l3norm = L_MC(3)/L_MC(1);
+   % Wakeby parameters
+   wp_MC{i} = f_Wakeby(wc_MC(1), wc_MC(2), wc_MC(3), l2norm, l3norm);
+   
+   % given quantiles, return value from Wakeby distribution
+   xval(i,:) = f_wkbinv(q, wp_MC{i}{:}); % acceess all 5 param from row i of wp_MC
+end
+
+% clip the data so wkb_est does not exceed xMax
+xval = min(xval, xMax);
+
+% multiply l1 of observed data back in for storm surge
+wkb_est = mean(obsP1)*xval;
 
 
 
