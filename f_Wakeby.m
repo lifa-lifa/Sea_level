@@ -5,7 +5,7 @@
 % OUTPUTS: Wakeby parameters
 
 
-function [alphaE, betaE, gammaE, deltaE, xiE] = f_Wakeby(D1, D2, D3, l2, l3)
+function [P] = f_Wakeby(D1, D2, D3, l2, l3)
     
     % solve polynomial of D1z^2 + D2z + D3 == 0 for z
     z = roots([D1 D2 D3]);
@@ -30,5 +30,5 @@ function [alphaE, betaE, gammaE, deltaE, xiE] = f_Wakeby(D1, D2, D3, l2, l3)
     
     xiE = l1norm - alphaE/(1+betaE) - gammaE/(1-deltaE);
     
-% P = [alphaE, betaE, gammaE, deltaE, xiE];    
+P = {alphaE, betaE, gammaE, deltaE, xiE};    
 end

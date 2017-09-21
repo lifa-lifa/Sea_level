@@ -70,14 +70,13 @@ l3normP1 = L_P1(3)/L_P1(1);
 % output contains 5 parameters for Wakeby distribution with shape 
 % parameters B and D, scale parameters A and G, and location parameter M (or X).
 % output is in the order of [A, B, G, D, X]
-[A_P1, B_P1, G_P1, D_P1, X_P1] = f_Wakeby(wc_P1(1), wc_P1(2), wc_P1(3),...
-    l2normP1, l3normP1);
+wp_P1 = f_Wakeby(wc_P1(1), wc_P1(2), wc_P1(3), l2normP1, l3normP1);
 
 %% Generate values for P2
 % find num years that have no data, and therefore need generated values
 nYrsGenP2 = (1824-1500+1-length(obsP2))*repetitionFactor;
 % Generate values for P2 from Wakeby, multiply by mean (l1) of P3
-wakebyEstP2 = L_P1(1)*f_wkbrnd(A_P1, B_P1, G_P1, D_P1, X_P1, [nYrsGenP2,1]);
+wakebyEstP2 = L_P1(1)*f_wkbrnd(wp_P1{:}, [nYrsGenP2,1]);
 wakebyEstP2 = sort(wakebyEstP2, 'descend');    
 
     % print out max and min to check
@@ -88,7 +87,7 @@ wakebyEstP2 = sort(wakebyEstP2, 'descend');
 nReplaceP2 = sum(wakebyEstP2>thresholdP2);
 nTemp = 1;  % temp variable for while loop
 while nTemp > 0; % do until we have a list with only values below threshold
-    listReplaceP2 = L_P1(1)*f_wkbrnd(A_P1, B_P1, G_P1, D_P1, X_P1, [nReplaceP2,1]);
+    listReplaceP2 = L_P1(1)*f_wkbrnd(wp_P1{:}, [nReplaceP2,1]);
     nTemp = sum(listReplaceP2>thresholdP2);
 end
 
@@ -118,14 +117,13 @@ l2normP12 = t_P12;
 l3normP12 = L_P12(3)/L_P12(1); 
 
 % compute Wakeby parameters [A, B, G, D, X]
-[A_P12, B_P12, G_P12, D_P12, X_P12] = f_Wakeby(wc_P12(1), wc_P12(2), wc_P12(3),...
-    l2normP12, l3normP12);
+wp_P12 = f_Wakeby(wc_P12(1), wc_P12(2), wc_P12(3),l2normP12, l3normP12);
 
 %% Generate values for P3
 % find num years that have no data, and therefore need generated values
 nYrsGenP3 = (1499-1044+1-length(obsP3))*repetitionFactor;
 % Generate values for P1 from Wakeby, multiply by mean (l1) of combined P23
-wakebyEstP3 = L_P12(1)*f_wkbrnd(A_P12, B_P12, G_P12, D_P12, X_P12, [nYrsGenP3,1]);
+wakebyEstP3 = L_P12(1)*f_wkbrnd(wp_P12{:}, [nYrsGenP3,1]);
 wakebyEstP3 = sort(wakebyEstP3, 'descend'); 
 
     % print out max and min to check
@@ -136,7 +134,7 @@ wakebyEstP3 = sort(wakebyEstP3, 'descend');
 nReplaceP3 = sum(wakebyEstP3>thresholdP3);
 nTemp = 1;  % temp variable for while loop
 while nTemp > 0; % do until we have a list with only values below threshold
-    listReplaceP3 = L_P12(1)*f_wkbrnd(A_P12, B_P12, G_P12, D_P12, X_P12, [nReplaceP3,1]);
+    listReplaceP3 = L_P12(1)*f_wkbrnd(wp_P12{:}, [nReplaceP3,1]);
     nTemp = sum(listReplaceP3>thresholdP3);
 end    
 
@@ -166,25 +164,23 @@ l2normP123 = t_P123;
 l3normP123 = L_P123(3)/L_P123(1); 
 
 % compute Wakeby parameters [A, B, G, D, X]
-[A_P123, B_P123, G_P123, D_P123, X_P123] = f_Wakeby(wc_P123(1), wc_P123(2), wc_P123(3),...
-    l2normP123, l3normP123);
+wp_P123 = f_Wakeby(wc_P123(1), wc_P123(2), wc_P123(3), l2normP123, l3normP123);
 
 %% Wakeby distribution
 % plot check
 % x_plot = (0:0.01:4);
-% plot(x_plot, f_wkbpdf(x_plot , A_P123, B_P123, G_P123, D_P123, X_P123));
+% plot(x_plot, f_wkbpdf(x_plot , wp_P123{:}));
 
 % quantiles
-quantEst = f_wkbinv(q, A_P1, B_P1, G_P1, D_P1, X_P1);
-quantEst2 = f_wkbinv(q, A_P12, B_P12, G_P12, D_P12, X_P12);
-quantEst3 = f_wkbinv(q, A_P123, B_P123, G_P123, D_P123, X_P123);
+quantEst = f_wkbinv(q, wp_P1{:});
+quantEst2 = f_wkbinv(q, wp_P12{:});
+quantEst3 = f_wkbinv(q, wp_P123{:});
 
 QE1 = L_P1(1)*quantEst;
 QE2 = L_P12(1)*quantEst2;
 QE3 = L_P123(1)*quantEst3;
 
 %% Print results for comparison
-
 L_P1
 t_val_P1 = [t_P1 t3_P1 t4_P1 t5_P1]
 L_P12
@@ -195,7 +191,7 @@ t_val_P123 = [t_P123 t3_P123 t4_P123 t5_P123]
 %% Save final Wakeby parameters from P123. Using .mat format, easier for next step to read  
 writeFolder = strcat(pwd,'\output\WakebyParam\');  % save to subfolder
 fWriteName = [writeFolder 'WakebyParam_P123.mat'];
-save(fWriteName, 'A_P123');
+save(fWriteName, 'wp_P123');
 
 
 
