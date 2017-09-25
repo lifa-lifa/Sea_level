@@ -65,10 +65,10 @@ for i= 1:3
 end
 
 % join outputs
-sampleObs = [uncObsP1 uncObsP2 uncObsP3];
+% sampleObs = [uncObsP1 uncObsP2 uncObsP3];
 sampleObsP12 = [uncObsP1 uncObsP2];
 % test only
-% sampleNEJO_1 = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]
+sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54];
 
 
 %% Distribution estimate
@@ -76,10 +76,14 @@ sampleObsP12 = [uncObsP1 uncObsP2];
 wbMleParam = mle((sampleObs-gammaWE), 'distribution', 'Weibull')
 % Exponential (Matlab returns mu, Mathematica returns lambda = 1/mu)
 exMleParam = mle(sampleObs-gammaWE, 'distribution', 'Exponential')
-exMleParam_lambda = 1/exMleParam
+exMleParam_lambda = 1/exMleParam  % inverse, for comparison with Mathematica results
 
+truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30];
 
-
+%% Conditional MLE estimate
+exPDF = pdf('Exponential', exMleParam, sampleObs-gammaWE)
+exCDF = cdf('Exponential', exMleParam, truncation)
+ExLikelihood = nansum(log(exPDF./exCDF)) 
 
 
 %% direct comparison to NEJO mathematica MLS KS test
