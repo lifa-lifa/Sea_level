@@ -79,11 +79,32 @@ exMleParam = mle(sampleObs-gammaWE, 'distribution', 'Exponential')
 exMleParam_lambda = 1/exMleParam  % inverse, for comparison with Mathematica results
 
 truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30];
+truncation_true = truncation>0;
 
 %% Conditional MLE estimate
-exPDF = pdf('Exponential', exMleParam, sampleObs-gammaWE)
-exCDF = cdf('Exponential', exMleParam, truncation)
-ExLikelihood = nansum(log(exPDF./exCDF)) 
+exPDF = pdf('Exponential', sampleObs-gammaWE, exMleParam)
+exCDF = cdf('Exponential', truncation, exMleParam)
+ExLikelihood = sum(log(exPDF./(1-exCDF))) 
+
+f_LikelihoodEx = @(data, trunc, lambda) sum(log(pdf('Exponential', data, lambda)./...
+                                      (1-cdf('Exponential', trunc, lambda))));
+                                  
+data = cell(2,1);
+data{1} = (sampleObs-gammaWE);
+data{2} = truncation;
+
+% custom log likelihood function, we want to maximize this function
+custnloglf = @(lambda, data, cens, freq) -nansum(log((pdf('Exponential', data{1}, lambda))./...
+                                                     (1-cdf('Exponential', data{2}, lambda))));
+phat = mle(data, 'nloglf', custnloglf, 'start', exMleParam)
+% custpdf = @(data,lambda) pdf('Exponential', data, lambda);
+% custcdf = @(data,lambda) cdf('Exponential', truncation, lambda);
+% phat = mle((sampleObs-gammaWE), 'pdf', custpdf, 'cdf', custcdf, 'start', exMleParam)
+1/phat
+
+
+
+
 
 
 %% direct comparison to NEJO mathematica MLS KS test
