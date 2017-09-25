@@ -73,34 +73,29 @@ sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.77
 
 %% Distribution estimate
 % Weibull (parambers in order of scale (beta), shape (alpha))
-wbMleParam = mle((sampleObs-gammaWE), 'distribution', 'Weibull')
+wbMleParam = mle((sampleObs-gammaWE), 'distribution', 'Weibull');
 % Exponential (Matlab returns mu, Mathematica returns lambda = 1/mu)
-exMleParam = mle(sampleObs-gammaWE, 'distribution', 'Exponential')
-exMleParam_lambda = 1/exMleParam  % inverse, for comparison with Mathematica results
+estExpMle = mle(sampleObs-gammaWE, 'distribution', 'Exponential')
+estExpMle_lambda = 1/estExpMle;  % inverse, for comparison with Mathematica results
 
 truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30];
-truncation_true = truncation>0;
 
-%% Conditional MLE estimate
-exPDF = pdf('Exponential', sampleObs-gammaWE, exMleParam)
-exCDF = cdf('Exponential', truncation, exMleParam)
-ExLikelihood = sum(log(exPDF./(1-exCDF))) 
-
-f_LikelihoodEx = @(data, trunc, lambda) sum(log(pdf('Exponential', data, lambda)./...
-                                      (1-cdf('Exponential', trunc, lambda))));
-                                  
+%% Conditional MLE estimate    
+% prepare the input data in cell array, necessary at MLE only takes one input arg. 
+% i.e. cannot input samples and truncation as two arguments
 data = cell(2,1);
 data{1} = (sampleObs-gammaWE);
 data{2} = truncation;
 
-% custom log likelihood function, we want to maximize this function
-custnloglf = @(lambda, data, cens, freq) -nansum(log((pdf('Exponential', data{1}, lambda))./...
-                                                     (1-cdf('Exponential', data{2}, lambda))));
-phat = mle(data, 'nloglf', custnloglf, 'start', exMleParam)
-% custpdf = @(data,lambda) pdf('Exponential', data, lambda);
-% custcdf = @(data,lambda) cdf('Exponential', truncation, lambda);
-% phat = mle((sampleObs-gammaWE), 'pdf', custpdf, 'cdf', custcdf, 'start', exMleParam)
-1/phat
+% custom negative log likelihood function, we want to miminize this function
+% recall mu = 1/lambda. Matlab uses mu to define exponential distribution
+custnloglf = @(mu, data, cens, freq) -nansum(log((pdf('Exponential', data{1}, mu))./...
+                                                     (1-cdf('Exponential', data{2}, mu))));
+estExpMleTrunc = mle(data, 'nloglf', custnloglf, 'start', estExpMle);
+1/estExpMleTrunc % Mathematica output check
+LLExpMle = custnloglf(estExpMleTrunc, data)
+
+
 
 
 
@@ -110,7 +105,3 @@ phat = mle(data, 'nloglf', custnloglf, 'start', exMleParam)
 %% direct comparison to NEJO mathematica MLS KS test
 % obsminusThresh = [258, 286.01, 290, 301, 366, 246, 256, 313];
 % estExMLE = mle((obsminusThresh-gammaWE), 'distribution', 'Exponential');
-
-
-
-
