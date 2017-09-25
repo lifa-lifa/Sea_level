@@ -54,10 +54,16 @@ lambdaPoisson = nobs/TE;
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
 %% Simulate uncertainty
-% generate rand values between 0 and 1 from uniform distribution, to array of size nSim rows and 1 column
-rand0_1 = normrnd(10, 2, nSim, 1);
-
-
+% generate values from normal distribution, truncate using gamma
+% uncObsP1 = f_UncertaintySim(obsP1, sigmaP1, gammaP1);
+for i= 1:3
+   % eval using uncertainty simulation, and do for each period using that
+   % period's observations, sigma, and gamma
+   % generates variables uncObsPx, x=1,2,3
+   eval(['uncObsP' num2str(i) '=f_UncertaintySim(obsP' num2str(i)...
+                                              ', sigmaP' num2str(i)...
+                                              ', gammaP' num2str(i) ')']); 
+end
 
 %% Distribution estimate
 % Weibull

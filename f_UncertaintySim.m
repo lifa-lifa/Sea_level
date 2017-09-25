@@ -10,9 +10,12 @@
 
 function [returnValues] = f_UncertaintySim(mu, sigma, trunc)
 
-   
+    % generate values from normal distribution
+    normalValues = normrnd(mu, sigma);
+    % drop values larger than truncation 
+    normalValues = normalValues(normalValues>trunc);
 
-returnValues = slr_sim_msYears;    
+    returnValues = normalValues;    
 
 end
 
