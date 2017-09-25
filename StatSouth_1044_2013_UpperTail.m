@@ -8,7 +8,7 @@ clear all
 clc
 
 %% Inputs
-rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
+% rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 nSim = 10;
 % return periods and years
 msYears = [1990, 2025, 2050, 2080, 2100]'; % milestone years
@@ -55,21 +55,28 @@ qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
 %% Simulate uncertainty
 % generate values from normal distribution, truncate using gamma
-% uncObsP1 = f_UncertaintySim(obsP1, sigmaP1, gammaP1);
 for i= 1:3
    % eval using uncertainty simulation, and do for each period using that
-   % period's observations, sigma, and gamma
-   % generates variables uncObsPx, x=1,2,3
+   % period's observations, sigma, and gamma. Generates variables uncObsPx, x=1,2,3
+   % e.g.  uncObsP1 = f_UncertaintySim(obsP1, sigmaP1, gammaP1);
    eval(['uncObsP' num2str(i) '=f_UncertaintySim(obsP' num2str(i)...
                                               ', sigmaP' num2str(i)...
-                                              ', gammaP' num2str(i) ')']); 
+                                              ', gammaP' num2str(i) ');']); 
 end
 
+% join outputs
+sampleObs = [uncObsP1 uncObsP2 uncObsP3];
+sampleObsP12 = [uncObsP1 uncObsP2];
+% test only
+% sampleNEJO_1 = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]
+
+
 %% Distribution estimate
-% Weibull
-wbMleParam = mle(obsP3Trunc, 'distribution', 'Weibull');
-% Exponential
-exMleParam = mle(obsP3Trunc, 'distribution', 'Exponential');
+% Weibull (parambers in order of scale (beta), shape (alpha))
+wbMleParam = mle((sampleObs-gammaWE), 'distribution', 'Weibull')
+% Exponential (Matlab returns mu, Mathematica returns lambda = 1/mu)
+exMleParam = mle(sampleObs-gammaWE, 'distribution', 'Exponential')
+exMleParam_lambda = 1/exMleParam
 
 
 
