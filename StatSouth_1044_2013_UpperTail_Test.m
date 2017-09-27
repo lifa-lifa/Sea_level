@@ -63,6 +63,7 @@ LLExpMle = custnloglf(estExpMleTrunc, data)
 
 NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12))
 lambdaPoisson = NPoissonSimulation/TE;
+lambdaPoissonMin = ceil(TE/min(yearT))/TE
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
 % random number from Poisson distribution
@@ -89,8 +90,8 @@ estExpMleNewSample_lambda = 1/estExpMleNewSample  % inverse, for comparison with
 qEstExpMle = expinv(qSimNewSample, estExpMleNewSample) + gammaWE
 
 %% KS test
-ExpCFD = cdf('Exponential', estExpMleTrunc)
-% kstest()
+ExpCFD = makedist('Exponential', estExpMleTrunc);
+[h,p] = kstest(data{1}, ExpCFD)
 
 
 
