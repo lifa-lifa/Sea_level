@@ -17,6 +17,7 @@ data_temp = cell2mat(data_temp);  % convert cell array to matrix
 
 
 %% Inputs
+rng default;  % fixes the rng random seed to Mersenne Twister 5489
 threshold = 111;
 alpha = 0.10;  % significance level
 nSim = 10000;  % number of simulations, typ. 10000
@@ -166,38 +167,38 @@ end
 %     hold off
     
 %% QQ plots
-for msYear_idx = 1:num_msYears;
-    hfig = figure(msYear_idx);
-    title_generated = ['QQ-Plot Storms South Copenhagen 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
-    % set figure appearances
-        set(gca, 'XLim',[110 max(quantile_wl_slr(7,:,msYear_idx))],...
-                 'YLim',[110 max(quantile_wl_slr(7,:,msYear_idx))]);
-        box on
-        ylabel('Observed quantile [cm]');
-        xlabel('Theoretical quantile [cm]');
-        title(title_generated);
-        % plot things
-            hold on
-            plot(wbl_obs, obsSorted, '+'); % observations
-            plot([0,400],[0,400], 'k', 'HandleVisibility','off'); % plot diagonal
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(4,:,msYear_idx), 'k'); % median
-            % 68% confidence
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(3,:,msYear_idx), 'b');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(5,:,msYear_idx), 'b', 'HandleVisibility','off');
-            % 90% confidence
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(2,:,msYear_idx), 'g');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(6,:,msYear_idx), 'g', 'HandleVisibility','off');
-            % 95% confidence
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(1,:,msYear_idx), 'r');
-            plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r', 'HandleVisibility','off');
-        legend('obs', 'median', '68% conf.', '90% conf.', '95% conf.');
-        hold off
-        
-        % save plots
-        writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
-        fWriteName = [writeFolder 'QQ-Plot Storms South CPH 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
-        print(fWriteName,'-dpng')
-end
+% for msYear_idx = 1:num_msYears;
+%     hfig = figure(msYear_idx);
+%     title_generated = ['QQ-Plot Storms South Copenhagen 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
+%     % set figure appearances
+%         set(gca, 'XLim',[110 max(quantile_wl_slr(7,:,msYear_idx))],...
+%                  'YLim',[110 max(quantile_wl_slr(7,:,msYear_idx))]);
+%         box on
+%         ylabel('Observed quantile [cm]');
+%         xlabel('Theoretical quantile [cm]');
+%         title(title_generated);
+%         % plot things
+%             hold on
+%             plot(wbl_obs, obsSorted, '+'); % observations
+%             plot([0,400],[0,400], 'k', 'HandleVisibility','off'); % plot diagonal
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(4,:,msYear_idx), 'k'); % median
+%             % 68% confidence
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(3,:,msYear_idx), 'b');
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(5,:,msYear_idx), 'b', 'HandleVisibility','off');
+%             % 90% confidence
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(2,:,msYear_idx), 'g');
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(6,:,msYear_idx), 'g', 'HandleVisibility','off');
+%             % 95% confidence
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(1,:,msYear_idx), 'r');
+%             plot(quantile_wl_slr(4,:,msYear_idx), quantile_wl_slr(7,:,msYear_idx), 'r', 'HandleVisibility','off');
+%         legend('obs', 'median', '68% conf.', '90% conf.', '95% conf.');
+%         hold off
+%         
+%         % save plots
+%         writeFolder = strcat(pwd,'\output\');  % save to subfolder called output
+%         fWriteName = [writeFolder 'QQ-Plot Storms South CPH 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
+%         print(fWriteName,'-dpng')
+% end
 
 
 

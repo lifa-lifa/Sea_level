@@ -7,16 +7,17 @@ close all
 clear all
 clc
 
-%% Inputs
-test = 1;
+%% Options
+test = 0; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
+
+%% Inputs
 nSim = 10;
 % return periods and years
 msYears = [1990, 2025, 2050, 2080, 2100]'; % milestone years
 yearT = [250, 500, 1000, 2000, 5000, 10000, 100000]';  % return periods
 % truncation
-gammaWE = 240;
-% take the larger of gammaWE or historial truncation level
+gammaWE = 240; % take the larger of gammaWE or historial truncation level
 gammaP1 = max(gammaWE, 200); % assumed historical truncation for P1
 gammaP2 = max(gammaWE, 240); % ditto P2
 gammaP3 = max(gammaWE, 270); % ditto P3
@@ -29,7 +30,7 @@ EndP2 = 1824;
 EndP3 = 1499;
 StartP3 = 1044;
 TE = EndP1-StartP3+1; % duration of all periods
-% TE = 972;
+if test ==1; TE = 972; end;
 TP1 = EndP1 - EndP2;
 TP2 = EndP2 - EndP3;
 TP3 = EndP3 - StartP3 + 1;
@@ -54,6 +55,13 @@ lambdaPoisson = nobs/TE;
 % Compute the Weibull values for our return periods
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
+%% preallocate arrays for Monte Carlo sim
+% qEstExpMle = zeros(nSim, length(yearT));
+% ksExpMLE = zeros(nSim, 1);
+% sampleObs = cells(nSim, 1);
+% sampleObsP12 = cells(nSim, 1);
+% lambda = cells(nSim, 1);
+
 %% Simulate uncertainty
 % generate values from normal distribution, truncate using gamma
 for i= 1:3
@@ -68,7 +76,6 @@ end
 sampleObs = [uncObsP1 uncObsP2 uncObsP3];
 sampleObsP12 = [uncObsP1 uncObsP2];
 if test == 1; sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]; end;
-
 
 % create truncation array, of same length as sampleObs
 for i= 1:3
@@ -131,7 +138,7 @@ qEstExpMle = expinv(qSimNewSample, estExpMleNewSample) + gammaWE;
 
 %% KS test
 ExpCFD = makedist('Exponential', estExpMleTrunc);
-[h,p] = kstest(data{1}, ExpCFD);
+[~,p] = kstest(data{1}, ExpCFD); % only save p value
 
 
 %% print output option
