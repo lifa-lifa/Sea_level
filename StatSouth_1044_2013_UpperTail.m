@@ -8,7 +8,7 @@ clear all
 clc
 
 %% Options
-test = 0; % if set to 1, random generated values are replaced by test values
+test = 1; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 
 %% Inputs
