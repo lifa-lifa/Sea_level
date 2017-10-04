@@ -27,7 +27,7 @@ yearT = [10, 20, 50, 100, 250, 500, ...
          1000, 2000, 3000, 5000, 10000, 100000, 1000000]';  % return periods
 yearT_plot = [50, 100, 250, 1000, 10000]';  % return periods for plotting
 obsYearsRange = 2016 - 1956 + 1; % range of years
-msYears = [1990, 2017, 2050, 2080, 2100]'; % milestone years
+msYears = [1990, 2017, 2025, 2050, 2080, 2100, 2115]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 num_yearT = length(yearT); % number of return period years
 
@@ -204,9 +204,12 @@ end
 %% Print for Excel
 printForExcelTrue = 1.0;
 if printForExcelTrue == 1.0;
-    printForExcel = [quantile_wl_slr(4,:,5)' ... % median
-                     quantile_wl_slr(5,:,5)' quantile_wl_slr(3,:,5)' ... % 68% upper/lower
-                     quantile_wl_slr(6,:,5)' quantile_wl_slr(2,:,5)']    % 90% upper/lower
+    for i = 1:num_msYears;
+        msYears(i)
+        printForExcel = [quantile_wl_slr(4,:,i)' ... % median
+                         quantile_wl_slr(5,:,i)' quantile_wl_slr(3,:,i)' ... % 68% upper/lower
+                         quantile_wl_slr(6,:,i)' quantile_wl_slr(2,:,i)']    % 90% upper/lower
+    end;
 end;
 
 
