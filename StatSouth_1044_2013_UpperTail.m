@@ -12,10 +12,12 @@ test = 0; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 
 %% Inputs
-nSim = 1000;
+nSim = 10;
 % return periods and years
 msYears = [1990, 2025, 2050, 2080, 2100]'; % milestone years
 yearT = [250, 500, 1000, 2000, 5000, 10000, 100000]';  % return periods
+num_yearT = length(yearT);
+num_msYears = length(msYears);
 % truncation
 gammaWE = 240; % take the larger of gammaWE or historial truncation level
 gammaP1 = max(gammaWE, 200); % assumed historical truncation for P1
@@ -167,5 +169,14 @@ end % end of nSim loop
 
 %% SLR - simulated sea level rise for milestone years
 slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB);
+slr_sim_msYears_cm = 100*slr_sim_msYears;
+
+%% Compute joint distribution of SLR and Exponential estimates together
+qEstExpMLESLR = zeros(nSim, num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+   % use broadfast function to element-wise add SLR to Est Exp
+   % loop through all milestone years
+   qEstExpMLESLR(:,:,i) = bsxfun(@plus, qEstExpMle, slr_sim_msYears_cm(:,i));
+end
 
 
