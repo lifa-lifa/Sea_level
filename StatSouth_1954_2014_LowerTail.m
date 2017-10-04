@@ -37,6 +37,7 @@ quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 % adjustment rates
 rIA = 0.00145; % rate of isostatic adjustment (in meter/year)
 rSC = 0; % rate of storm contribution (in meter/year)
+rOB = 0.0039; % rate of observed SLR
 
 % SLR values from CRES 
 %(for reference see Fig 3.7 of Storebælt Østtunnel, Klimavurdering og Sikring, Ramperne 2015)
@@ -61,7 +62,7 @@ indices = arrayfun(fHandle, rand0_1);
 slr_sim = slr_values(indices);
 
 % evaluate climate factor for milestone years
-climateFactor = f_SLR_Norm(msYears, rIA, rSC);
+climateFactor = f_SLR_Norm_ParaLinear(msYears, rIA, rSC, rOB); 
 % simulated slr including climate change for milestone years
 % array columns are msYears, rows are each slr_sim. 
 % transposed climateFactor for multiplication to match dimensions
