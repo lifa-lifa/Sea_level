@@ -40,7 +40,7 @@ rSC = 0; % rate of storm contribution (in meter/year)
 
 % SLR values from CRES 
 %(for reference see Fig 3.7 of Storebælt Østtunnel, Klimavurdering og Sikring, Ramperne 2015)
-slr_values=[0:0.125:3]' + rIA;  % stepped SLR 0 to 3 in steps of 0.125m.  Add rIA to get absoluate SLR
+slr_values=[0:0.125:3]';  % stepped SLR 0 to 3 in steps of 0.125m.  Add rIA to get absoluate SLR
 % Probabilities for this scenario
 slr_prob =[0, 0.007488233, 0.025673941, 0.067394095, 0.132648695,...
     0.177578092, 0.174368849, 0.133718442, 0.084510056, 0.054557125,...
@@ -199,6 +199,15 @@ end
 %         fWriteName = [writeFolder 'QQ-Plot Storms South CPH 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
 %         print(fWriteName,'-dpng')
 % end
+
+%% Print for Excel
+printForExcelTrue = 1.0;
+if printForExcelTrue == 1.0;
+    printForExcel = [quantile_wl_slr(4,:,5)' ... % median
+                     quantile_wl_slr(5,:,5)' quantile_wl_slr(3,:,5)' ... % 68% upper/lower
+                     quantile_wl_slr(6,:,5)' quantile_wl_slr(2,:,5)']    % 90% upper/lower
+end;
+
 
 
 
