@@ -8,7 +8,7 @@ clear all
 clc
 
 %% Options
-test = 1; % if set to 1, random generated values are replaced by test values
+test = 0; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 
 %% Inputs
@@ -56,90 +56,93 @@ lambdaPoisson = nobs/TE;
 qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
 %% preallocate arrays for Monte Carlo sim
-% qEstExpMle = zeros(nSim, length(yearT));
-% ksExpMLE = zeros(nSim, 1);
-% sampleObs = cells(nSim, 1);
-% sampleObsP12 = cells(nSim, 1);
-% lambda = cells(nSim, 1);
+sampleObs = cell(nSim, 1);
+sampleObsP12 = cell(nSim, 1);
+truncation = cell(nSim,1);
+qEstExpMle = zeros(nSim, length(yearT));
+ksExpMLE = zeros(nSim, 1);
+lambda = cell(nSim, 1);
 
 %% Simulate uncertainty
 % generate values from normal distribution, truncate using gamma
-for i= 1:3
-   % eval using uncertainty simulation, and do for each period using that
-   % period's observations, sigma, and gamma. Generates variables uncObsPx, x=1,2,3
-   % e.g.  uncObsP1 = f_UncertaintySim(obsP1, sigmaP1, gammaP1);
-   eval(['uncObsP' num2str(i) '=f_UncertaintySim(obsP' num2str(i)...
-                                              ', sigmaP' num2str(i)...
-                                              ', gammaP' num2str(i) ');']); 
-end
-% join outputs
-sampleObs = [uncObsP1 uncObsP2 uncObsP3];
-sampleObsP12 = [uncObsP1 uncObsP2];
-if test == 1; sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]; end;
+for n = 1:nSim
+    for i= 1:3
+       % eval using uncertainty simulation, and do for each period using that
+       % period's observations, sigma, and gamma. Generates variables uncObsPx, x=1,2,3
+       % e.g.  uncObsP1 = f_UncertaintySim(obsP1, sigmaP1, gammaP1);
+       eval(['uncObsP' num2str(i) '=f_UncertaintySim(obsP' num2str(i)...
+                                                  ', sigmaP' num2str(i)...
+                                                  ', gammaP' num2str(i) ');']); 
+    end
+    % join outputs
+    sampleObs{n} = [uncObsP1 uncObsP2 uncObsP3];
+    sampleObsP12{n} = [uncObsP1 uncObsP2];
+    if test == 1; sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]; end;
 
-% create truncation array, of same length as sampleObs
-for i= 1:3
-   eval(['TruncP' num2str(i) '= gammaP' num2str(i) '- gammaWE;']); 
-   eval(['TruncP' num2str(i) '= repmat(TruncP' num2str(i) ',1, length(uncObsP' num2str(i) '));'])
-end
-truncation = [TruncP1 TruncP2 TruncP3];
-if test == 1; truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30]; end;
+    % create truncation array, of same length as sampleObs
+    for i= 1:3
+       eval(['TruncP' num2str(i) '= gammaP' num2str(i) '- gammaWE;']); 
+       eval(['TruncP' num2str(i) '= repmat(TruncP' num2str(i) ',1, length(uncObsP' num2str(i) '));'])
+    end
+    truncation{n} = [TruncP1 TruncP2 TruncP3];
+    if test == 1; truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30]; end;
 
 
-%% Distribution estimate
-% Weibull (parambers in order of scale (beta), shape (alpha))
-wbMleParam = mle((sampleObs-gammaWE), 'distribution', 'Weibull');
-% Exponential (Matlab returns mu, Mathematica returns lambda = 1/mu)
-estExpMle = mle(sampleObs-gammaWE, 'distribution', 'Exponential');
-estExpMle_lambda = 1/estExpMle;  % inverse, for comparison with Mathematica results
+    %% Distribution estimate
+    % Weibull (parambers in order of scale (beta), shape (alpha))
+    wbMleParam = mle((sampleObs{n}-gammaWE), 'distribution', 'Weibull');
+    % Exponential (Matlab returns mu, Mathematica returns lambda = 1/mu)
+    estExpMle = mle(sampleObs{n}-gammaWE, 'distribution', 'Exponential');
+    estExpMle_lambda = 1/estExpMle;  % inverse, for comparison with Mathematica results
 
-%% Conditional MLE estimate    
-% prepare the input data in cell array, necessary at MLE only takes one input arg. 
-% i.e. cannot input samples and truncation as two arguments
-data = cell(2,1);
-data{1} = (sampleObs-gammaWE);
-data{2} = truncation;
+    %% Conditional MLE estimate    
+    % prepare the input data in cell array, necessary at MLE only takes one input arg. 
+    % i.e. cannot input samples and truncation as two arguments
+    data = cell(2,1);
+    data{1} = (sampleObs{n}-gammaWE);
+    data{2} = truncation{n};
 
-% custom negative log likelihood function, we want to miminize this function
-% recall mu = 1/lambda. Matlab uses mu to define exponential distribution
-custnloglf = @(mu, data, cens, freq) -nansum(log((pdf('Exponential', data{1}, mu))./...
-                                                     (1-cdf('Exponential', data{2}, mu))));
-estExpMleTrunc = mle(data, 'nloglf', custnloglf, 'start', estExpMle);
-estExpMleTrunc_lambda = 1/estExpMleTrunc; % Mathematica output check
-LLExpMle = custnloglf(estExpMleTrunc, data);
+    % custom negative log likelihood function, we want to miminize this function
+    % recall mu = 1/lambda. Matlab uses mu to define exponential distribution
+    custnloglf = @(mu, data, cens, freq) -nansum(log((pdf('Exponential', data{1}, mu))./...
+                                                         (1-cdf('Exponential', data{2}, mu))));
+    estExpMleTrunc = mle(data, 'nloglf', custnloglf, 'start', estExpMle);
+    estExpMleTrunc_lambda = 1/estExpMleTrunc; % Mathematica output check
+    LLExpMle = custnloglf(estExpMleTrunc, data);
 
-NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12));
-lambdaPoisson = NPoissonSimulation/TE;
-lambdaPoissonMin = ceil(TE/min(yearT))/TE;
-qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
+    NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12));
+    lambdaPoisson = NPoissonSimulation/TE;
+    lambdaPoissonMin = ceil(TE/min(yearT))/TE;
+    qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
 
-% random number from Poisson distribution
-k = poissrnd(NPoissonSimulation, 1);
-% cannot have too low number
-kmin = ceil(TE/min(yearT));
-kval = max(k, kmin);
-if test == 1; kval = 13; end;
+    % random number from Poisson distribution
+    k = poissrnd(NPoissonSimulation, 1);
+    % cannot have too low number
+    kmin = ceil(TE/min(yearT));
+    kval = max(k, kmin);
+    if test == 1; kval = 13; end;
 
-% new sample from Exponential
-lambdaPoissonSimNewSample = kval/TE;
-qSimNewSample = 1-1./(lambdaPoissonSimNewSample*yearT);  % get quantiles
-% generate k numbers from the estimated Exponential distribution
-newSampleEx = exprnd(estExpMleTrunc, kval, 1);
-%!!!!! for test, overwrite random generated new sample
-if test == 1; newSampleEx = [46.6563, 76.9496, 9.64744, 44.7102, 62.7202, 125.892, 23.0628, 60.1462, 27.1351, 4.99122,...
-41.8752, 90.3281, 27.3091]; end;
+    % new sample from Exponential
+    lambdaPoissonSimNewSample = kval/TE;
+    qSimNewSample = 1-1./(lambdaPoissonSimNewSample*yearT);  % get quantiles
+    % generate k numbers from the estimated Exponential distribution
+    newSampleEx = exprnd(estExpMleTrunc, kval, 1);
+    %!!!!! for test, overwrite random generated new sample
+    if test == 1; newSampleEx = [46.6563, 76.9496, 9.64744, 44.7102, 62.7202, 125.892, 23.0628, 60.1462, 27.1351, 4.99122,...
+    41.8752, 90.3281, 27.3091]; end;
 
-% determine Exponential - MLE
-estExpMleNewSample = mle(newSampleEx, 'distribution', 'Exponential');
-estExpMleNewSample_lambda = 1/estExpMleNewSample;  % inverse, for comparison with Mathematica results
+    % determine Exponential - MLE
+    estExpMleNewSample = mle(newSampleEx, 'distribution', 'Exponential');
+    estExpMleNewSample_lambda = 1/estExpMleNewSample;  % inverse, for comparison with Mathematica results
 
-% values at quantiles
-qEstExpMle = expinv(qSimNewSample, estExpMleNewSample) + gammaWE;
+    % values at quantiles
+    qEstExpMle(n,:) = expinv(qSimNewSample, estExpMleNewSample) + gammaWE;
 
-%% KS test
-ExpCFD = makedist('Exponential', estExpMleTrunc);
-[~,p] = kstest(data{1}, ExpCFD); % only save p value
-
+    %% KS test
+    ExpCFD = makedist('Exponential', estExpMleTrunc);
+    [~,p] = kstest(data{1}, ExpCFD); % only save p value
+    
+end % end of nSim loop
 
 %% print output option
 print = 1;
