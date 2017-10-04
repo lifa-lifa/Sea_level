@@ -12,7 +12,7 @@ test = 0; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 
 %% Inputs
-nSim = 10;
+nSim = 1000;
 % return periods and years
 msYears = [1990, 2025, 2050, 2080, 2100]'; % milestone years
 yearT = [250, 500, 1000, 2000, 5000, 10000, 100000]';  % return periods
@@ -34,6 +34,11 @@ if test ==1; TE = 972; end;
 TP1 = EndP1 - EndP2;
 TP2 = EndP2 - EndP3;
 TP3 = EndP3 - StartP3 + 1;
+
+% adjustment rates
+rIA = 0.00145; % rate of isostatic adjustment (in meter/year)
+rSC = 0; % rate of storm contribution (in meter/year)
+rOB = 0.0039; % rate of observed SLR
 
 
 %% Data
@@ -60,6 +65,7 @@ sampleObs = cell(nSim, 1);
 sampleObsP12 = cell(nSim, 1);
 truncation = cell(nSim,1);
 qEstExpMle = zeros(nSim, length(yearT));
+LLExpMle = zeros(nSim, 1);
 ksExpMLE = zeros(nSim, 1);
 lambda = cell(nSim, 1);
 
@@ -77,7 +83,7 @@ for n = 1:nSim
     % join outputs
     sampleObs{n} = [uncObsP1 uncObsP2 uncObsP3];
     sampleObsP12{n} = [uncObsP1 uncObsP2];
-    if test == 1; sampleObs = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]; end;
+    if test == 1; sampleObs{1} = [243.513, 257.182, 290.481, 250.69, 283.059, 311.376, 331.04, 304.774, 358.54]; end;
 
     % create truncation array, of same length as sampleObs
     for i= 1:3
@@ -85,7 +91,7 @@ for n = 1:nSim
        eval(['TruncP' num2str(i) '= repmat(TruncP' num2str(i) ',1, length(uncObsP' num2str(i) '));'])
     end
     truncation{n} = [TruncP1 TruncP2 TruncP3];
-    if test == 1; truncation = [0, 0, 0, 0, 0, 0, 0, 30, 30]; end;
+    if test == 1; truncation{1} = [0, 0, 0, 0, 0, 0, 0, 30, 30]; end;
 
 
     %% Distribution estimate
@@ -108,7 +114,7 @@ for n = 1:nSim
                                                          (1-cdf('Exponential', data{2}, mu))));
     estExpMleTrunc = mle(data, 'nloglf', custnloglf, 'start', estExpMle);
     estExpMleTrunc_lambda = 1/estExpMleTrunc; % Mathematica output check
-    LLExpMle = custnloglf(estExpMleTrunc, data);
+    LLExpMle(n) = custnloglf(estExpMleTrunc, data);
 
     NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12));
     lambdaPoisson = NPoissonSimulation/TE;
@@ -142,18 +148,24 @@ for n = 1:nSim
     ExpCFD = makedist('Exponential', estExpMleTrunc);
     [~,p] = kstest(data{1}, ExpCFD); % only save p value
     
+
+    %% print output option
+    print = 0;
+    if print == 1
+        n
+        sampleObs{n}
+        truncation{n}
+        estExpMleTrunc_lambda
+        kmin
+        kval
+        estExpMleNewSample_lambda
+    %     qEstExpMle
+        p
+    end
+
 end % end of nSim loop
 
-%% print output option
-print = 1;
-if print == 1
-    sampleObs
-    truncation
-    estExpMleTrunc_lambda
-    kmin
-    kval
-    estExpMleNewSample_lambda
-%     qEstExpMle
-    p
-end
+%% SLR - simulated sea level rise for milestone years
+slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB);
+
 
