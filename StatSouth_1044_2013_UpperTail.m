@@ -42,6 +42,8 @@ rIA = 0.00145; % rate of isostatic adjustment (in meter/year)
 rSC = 0; % rate of storm contribution (in meter/year)
 rOB = 0.0039; % rate of observed SLR
 
+% quantile values
+quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 
 %% Data
 % Data preparation
@@ -178,5 +180,14 @@ for i = 1:num_msYears;
    % loop through all milestone years
    qEstExpMLESLR(:,:,i) = bsxfun(@plus, qEstExpMle, slr_sim_msYears_cm(:,i));
 end
+
+% get quantile values from the combined SLR and WL data
+quantile_wl_slr = zeros(length(quantileValues), num_yearT, num_msYears); % preallocate
+for i = 1:num_msYears;
+    for j = 1:num_yearT;
+        quantile_wl_slr(:,j,i) = quantile(qEstExpMLESLR(:,j,i), quantileValues);
+    end
+end
+
 
 
