@@ -23,9 +23,10 @@ obsP1 = sort(cell2mat(obsP1), 'descend');  % P1 is 1825-2014
 %% Inputs
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 nSim = 10000;
-rIA = 0.0011;
-rSC = 0.0012;
-msYears = [1990 2100];
+rIA = 0.00145;
+rSC = 0;
+rOB = 0.0039;
+msYears = [1990, 2017, 2025, 2050, 2080, 2100, 2115]'; % milestone years
 num_yearT = length(yearT);
 num_msYears = length(msYears);
 xMax = 10; % used to clip the Wakeby estimates to 10 times the avg value
@@ -36,8 +37,9 @@ q = 1-1./(1 * yearT);
 quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 
 %% SLR - simulated sea level rise for milestone years
-slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC);
+slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB);
 slr_sim_msYears_cm = 100*slr_sim_msYears;
+
 
 %% Monte Carlo sim for WL - based on Wakeby distribution
 nobs = length(obsP1); % based on AMS, therefore use nobs, instead of Poisson dist.
@@ -91,8 +93,20 @@ for i = 1:num_msYears;
     end
 end
 
-% print
-quantile_wl_slr./100 % in meters
+% % print
+% quantile_wl_slr./100 % in meters
+
+%% Print for Excel
+printForExcelTrue = 1.0;
+if printForExcelTrue == 1.0;
+    format longG
+    for i = 1:num_msYears;
+        msYears(i)
+        printForExcel = [quantile_wl_slr(4,:,i)' ... % median
+                         quantile_wl_slr(5,:,i)' quantile_wl_slr(3,:,i)' ... % 68% upper/lower
+                         quantile_wl_slr(6,:,i)' quantile_wl_slr(2,:,i)']    % 90% upper/lower
+    end;
+end;
 
 
 

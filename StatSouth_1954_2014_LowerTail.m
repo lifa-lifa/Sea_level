@@ -27,7 +27,7 @@ yearT = [10, 20, 50, 100, 250, 500, ...
          1000, 2000, 3000, 5000, 10000, 100000, 1000000]';  % return periods
 yearT_plot = [50, 100, 250, 1000, 10000]';  % return periods for plotting
 obsYearsRange = 2016 - 1956 + 1; % range of years
-msYears = [1990, 2017, 2050, 2080, 2100]'; % milestone years
+msYears = [1990, 2017, 2025, 2050, 2080, 2100, 2115]'; % milestone years
 num_msYears = length(msYears);  % number of milestone years
 num_yearT = length(yearT); % number of return period years
 
@@ -35,37 +35,12 @@ num_yearT = length(yearT); % number of return period years
 quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 
 % adjustment rates
-rIA = 0.0011; % rate of isostatic adjustment (in meter/year)
-rSC = 0.0012; % rate of storm contribution (in meter/year)
+rIA = 0.00145; % rate of isostatic adjustment (in meter/year)
+rSC = 0; % rate of storm contribution (in meter/year)
+rOB = 0.0039; % rate of observed SLR
 
-% SLR values from CRES 
-%(for reference see Fig 3.7 of Storebælt Østtunnel, Klimavurdering og Sikring, Ramperne 2015)
-slr_values=[0:0.125:3]';  % stepped SLR 0 to 3 in steps of 0.125m
-% Probabilities for this scenario
-slr_prob =[0, 0.007488233, 0.025673941, 0.067394095, 0.132648695,...
-    0.177578092, 0.174368849, 0.133718442, 0.084510056, 0.054557125,...
-    0.036371416, 0.023534446, 0.017115961, 0.013906718, 0.011232349,...
-    0.009092854, 0.008023107, 0.006953359, 0.005348738, 0.003637142,...
-    0.002674369, 0.00203252, 0.001390672, 0.000641849, 0.000106975]';
-
-%% Sea level rise calculations
-slr_prob_cum = cumsum(slr_prob);
-% generate random values between 0 and 1 from uniform distribution, to array of size nSim rows and 1 column
-rand0_1 = rand(nSim,1);
-% anonymous function to find the index of the cum prob that just exceeds (x). 
-% Example, if cum_prob =[0, 0.19, 0.22, 0.3...], then fHandle(0.2)= 3.  'first' is stated explicitly
-fHandle = @(x) find(slr_prob_cum > x, 1, 'first');
-% find indices of all simulations
-indices = arrayfun(fHandle, rand0_1);
-% get the slr values corresponding to the indices
-slr_sim = slr_values(indices);
-
-% evaluate climate factor for milestone years
-climateFactor = f_SLR_Norm(msYears, rIA, rSC);
-% simulated slr including climate change for milestone years
-% array columns are msYears, rows are each slr_sim. 
-% transposed climateFactor for multiplication to match dimensions
-slr_sim_msYears = slr_sim * climateFactor';
+%% SLR - simulated sea level rise for milestone years
+slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB);
 
 %% Water level calculations
 %Data preparation
@@ -199,6 +174,18 @@ end
 %         fWriteName = [writeFolder 'QQ-Plot Storms South CPH 1954-2014 CRES yr ' num2str(msYears(msYear_idx))];
 %         print(fWriteName,'-dpng')
 % end
+
+%% Print for Excel
+printForExcelTrue = 1.0;
+if printForExcelTrue == 1.0;
+    for i = 1:num_msYears;
+        msYears(i)
+        printForExcel = [quantile_wl_slr(4,:,i)' ... % median
+                         quantile_wl_slr(5,:,i)' quantile_wl_slr(3,:,i)' ... % 68% upper/lower
+                         quantile_wl_slr(6,:,i)' quantile_wl_slr(2,:,i)']    % 90% upper/lower
+    end;
+end;
+
 
 
 
