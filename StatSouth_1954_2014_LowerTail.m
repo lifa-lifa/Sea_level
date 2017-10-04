@@ -35,12 +35,12 @@ num_yearT = length(yearT); % number of return period years
 quantileValues = [0.025, 0.05, 0.16, 0.5, 0.84, 0.95, 0.975]';
 
 % adjustment rates
-rIA = 0.0011; % rate of isostatic adjustment (in meter/year)
-rSC = 0.0012; % rate of storm contribution (in meter/year)
+rIA = 0.00145; % rate of isostatic adjustment (in meter/year)
+rSC = 0; % rate of storm contribution (in meter/year)
 
 % SLR values from CRES 
 %(for reference see Fig 3.7 of Storebælt Østtunnel, Klimavurdering og Sikring, Ramperne 2015)
-slr_values=[0:0.125:3]';  % stepped SLR 0 to 3 in steps of 0.125m
+slr_values=[0:0.125:3]' + rIA;  % stepped SLR 0 to 3 in steps of 0.125m.  Add rIA to get absoluate SLR
 % Probabilities for this scenario
 slr_prob =[0, 0.007488233, 0.025673941, 0.067394095, 0.132648695,...
     0.177578092, 0.174368849, 0.133718442, 0.084510056, 0.054557125,...
