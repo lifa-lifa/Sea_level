@@ -119,8 +119,20 @@ for i = 1:num_msYears;
     end
 end
 
-% print
-quantile_wl_slr./100 % in meters
+% % print
+% quantile_wl_slr./100 % in meters
+
+%% Print for Excel
+printForExcelTrue = 1.0;
+if printForExcelTrue == 1.0;
+    format longG
+    for i = 1:num_msYears;
+        msYears(i)
+        printForExcel = [quantile_wl_slr(4,:,i)' ... % median
+                         quantile_wl_slr(5,:,i)' quantile_wl_slr(3,:,i)' ... % 68% upper/lower
+                         quantile_wl_slr(6,:,i)' quantile_wl_slr(2,:,i)']    % 90% upper/lower
+    end;
+end;
 
 
 
