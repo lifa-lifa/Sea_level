@@ -6,7 +6,7 @@
 % msYears - Mile Stone Years (e.g. 1990, 2050, 2100)
 % rIA and rSC - % (meter/year)
 
-function [SLR] = f_SLR_Sim(nSim, msYears, rIA, rSC)
+function [SLR] = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB)
 
     % return periods and years
     num_msYears = length(msYears);  % number of milestone years
@@ -34,7 +34,7 @@ function [SLR] = f_SLR_Sim(nSim, msYears, rIA, rSC)
     slr_sim = slr_values(indices);
 
     % evaluate climate factor for milestone years
-    climateFactor = f_SLR_Norm(msYears, rIA, rSC);
+    climateFactor = f_SLR_Norm_ParaLinear(msYears, rIA, rSC, rOB);
     % simulated slr including climate change for milestone years
     % array columns are msYears, rows are each slr_sim. 
     % transposed climateFactor for multiplication to match dimensions
