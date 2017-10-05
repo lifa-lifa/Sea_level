@@ -6,16 +6,16 @@
 close all
 clear all
 clc
-
+tic % start timer
 %% Options
 test = 0; % if set to 1, random generated values are replaced by test values
 rng default;  % sets random seed. Matlab default is Mersenne Twister seed 5498
 
 %% Inputs
-nSim = 10;
+nSim = 10000;
 % return periods and years
-msYears = [1990, 2025, 2050, 2080, 2100]'; % milestone years
-yearT = [250, 500, 1000, 2000, 5000, 10000, 100000]';  % return periods
+msYears = [1990, 2017, 2025, 2050, 2080, 2100, 2115]'; % milestone years
+yearT = [500, 1000, 2000, 5000, 10000]';  % return periods
 num_yearT = length(yearT);
 num_msYears = length(msYears);
 % truncation
@@ -120,7 +120,7 @@ for n = 1:nSim
     estExpMleTrunc_lambda = 1/estExpMleTrunc; % Mathematica output check
     LLExpMle(n) = custnloglf(estExpMleTrunc, data);
 
-    NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12));
+    NPoissonSimulation = round(TE/(TP1+TP2)*length(sampleObsP12{n}));
     lambdaPoisson = NPoissonSimulation/TE;
     lambdaPoissonMin = ceil(TE/min(yearT))/TE;
     qSim = 1-1./(lambdaPoisson*yearT);  % get quantiles
@@ -154,17 +154,17 @@ for n = 1:nSim
     
 
     %% print output option
-    print = 0;
+    print = 1.0;
     if print == 1
         n
         sampleObs{n}
-        truncation{n}
-        estExpMleTrunc_lambda
-        kmin
-        kval
-        estExpMleNewSample_lambda
-    %     qEstExpMle
-        p
+%         truncation{n}
+%         estExpMleTrunc_lambda
+%         kmin
+%         kval
+%         estExpMleNewSample_lambda
+%         qEstExpMle
+%         p
     end
 
 end % end of nSim loop
@@ -173,7 +173,7 @@ end % end of nSim loop
 slr_sim_msYears = f_SLR_Sim(nSim, msYears, rIA, rSC, rOB);
 slr_sim_msYears_cm = 100*slr_sim_msYears;
 
-%% Compute joint distribution of SLR and Exponential estimates together
+%% add SLR and WL together
 qEstExpMLESLR = zeros(nSim, num_yearT, num_msYears); % preallocate
 for i = 1:num_msYears;
    % use broadfast function to element-wise add SLR to Est Exp
@@ -182,6 +182,7 @@ for i = 1:num_msYears;
 end
 
 % get quantile values from the combined SLR and WL data
+% this is quantile values from joint distribution of SLR and Exponential estimates together
 quantile_wl_slr = zeros(length(quantileValues), num_yearT, num_msYears); % preallocate
 for i = 1:num_msYears;
     for j = 1:num_yearT;
@@ -189,5 +190,20 @@ for i = 1:num_msYears;
     end
 end
 
+
+%% Print for Excel
+printForExcelTrue = 1.0;
+if printForExcelTrue == 1.0;
+    format longG
+    for i = 1:num_msYears;
+        msYears(i)
+        printForExcel = [quantile_wl_slr(4,:,i)' ... % median
+                         quantile_wl_slr(5,:,i)' quantile_wl_slr(3,:,i)' ... % 68% upper/lower
+                         quantile_wl_slr(6,:,i)' quantile_wl_slr(2,:,i)']    % 90% upper/lower
+    end;
+end;
+
+
+toc % stop timer, print duration
 
 
